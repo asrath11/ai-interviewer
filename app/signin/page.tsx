@@ -1,9 +1,10 @@
 'use client';
+import { useState } from 'react';
+import { PasswordInput } from '@/components/passwordInput';
 import SocialAuth from '@/components/socialAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { signIn } from 'next-auth/react';
-
 interface SigninProps {
   heading?: string;
   logo: {
@@ -22,14 +23,19 @@ const Signin = ({
   heading = 'Login',
   buttonText = 'Login',
   signupText = 'Need an account?',
-  signupUrl = 'https://shadcnblocks.com',
+  signupUrl = '/signup',
 }: SigninProps) => {
+  const [data, setData] = useState({
+    email: '',
+    password: '',
+  });
   const handleSignIn = async () => {
     try {
-      await signIn('credentials', {
-        email: 'test@example.com',
-        password: 'password',
+      const user = await signIn('credentials', {
+        email: data.email,
+        password: data.password,
       });
+      console.log(user);
     } catch (error) {
       console.error(error);
     }
@@ -46,12 +52,14 @@ const Signin = ({
               placeholder='Email'
               className='text-sm'
               required
+              value={data.email}
+              onChange={(e) => setData({ ...data, email: e.target.value })}
             />
-            <Input
-              type='password'
+            <PasswordInput
               placeholder='Password'
               className='text-sm'
-              required
+              value={data.password}
+              onChange={(e) => setData({ ...data, password: e.target.value })}
             />
             <Button type='submit' className='w-full' onClick={handleSignIn}>
               {buttonText}

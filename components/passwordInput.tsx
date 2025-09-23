@@ -14,17 +14,22 @@ interface InputProps {
   placeholder?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
-const PasswordInput = ({ className, placeholder, ...props }: InputProps) => {
+const PasswordInput = ({
+  className,
+  placeholder,
+  ...props
+}: InputProps) => {
   const [showPassword, setShowPassword] = React.useState(false);
   const disabled =
     props.value === '' || props.value === undefined || props.disabled;
 
   return (
-    <div className='relative'>
+    <div className='relative w-full'>
       <Input
         placeholder={placeholder}
         type={showPassword ? 'text' : 'password'}
         className={cn('hide-password-toggle pr-10', className)}
+        required
         {...props}
       />
       <Button

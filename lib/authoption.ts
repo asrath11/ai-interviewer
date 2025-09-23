@@ -1,6 +1,7 @@
 import { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import GoogleProvider from 'next-auth/providers/google';
+import { prisma } from './prisma';
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -11,12 +12,14 @@ export const authOptions: NextAuthOptions = {
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
-        // Normally you’d check DB here
-        const user = {
-          id: '1',
-          email: credentials?.email,
-          name: 'User Name',
-        };
+        const user = await prisma.user.findUnique({
+          where: {
+            email: credentials?.email,
+          },
+        });
+        if (!user) {
+          throw new Error('No user found');
+        }
         return user;
       },
     }),
@@ -42,5 +45,8 @@ export const authOptions: NextAuthOptions = {
 
   pages: {
     signIn: '/signin',
+  },
+  session: {
+    strategy: 'jwt',
   },
 };
