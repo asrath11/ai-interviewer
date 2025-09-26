@@ -19,7 +19,7 @@ export default function Hero() {
             technical edge to land offers faster.
           </p>
           <Button size='lg' className='h-12 px-6 text-base' asChild>
-            <Link href='/app'>Get Started for Free</Link>
+            <Link href='/dashboard'>Get Started for Free</Link>
           </Button>
         </div>
       </div>
