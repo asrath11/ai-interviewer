@@ -30,7 +30,6 @@ const navLinks = [
 export function Navbar({ user }: { user: { name: string; imageUrl: string } }) {
   const { jobInfoId } = useParams();
   const pathName = usePathname();
-
   return (
     <nav className='h-header border-b'>
       <div className='flex h-full items-center justify-between px-10'>

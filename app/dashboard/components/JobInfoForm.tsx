@@ -23,8 +23,9 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
-// Define form schema based on Prisma model
 const jobFormSchema = z.object({
   name: z.string().min(2, {
     message: 'Name must be at least 2 characters.',
@@ -47,14 +48,37 @@ const defaultValues: Partial<JobFormValues> = {
 };
 
 export function JobInfoForm() {
+  const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const form = useForm<JobFormValues>({
     resolver: zodResolver(jobFormSchema),
     defaultValues,
   });
 
-  function onSubmit(data: JobFormValues) {
-    // Handle form submission
-    console.log(data);
+  async function onSubmit(data: JobFormValues) {
+    try {
+      setIsSubmitting(true);
+      const response = await fetch('/api/job-info', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create job');
+      }
+
+      // Redirect to dashboard after successful creation
+      router.push('/dashboard');
+      router.refresh(); // Refresh the dashboard to show the new job
+    } catch (error) {
+      console.error('Error creating job:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -153,8 +177,13 @@ export function JobInfoForm() {
               </div>
             </div>
 
-            <Button type='submit' className='w-full font-bold text-md' size='lg'>
-              Create Job Info
+            <Button
+              type='submit'
+              className='w-full font-bold text-md'
+              size='lg'
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Creating...' : 'Create Job Info'}
             </Button>
           </form>
         </Form>
