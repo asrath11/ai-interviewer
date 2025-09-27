@@ -1,5 +1,5 @@
 'use client';
-import { PlusIcon } from 'lucide-react';
+import { PlusIcon, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { JobDescriptionCard } from './components/JobDescriptionCard';
@@ -15,16 +15,35 @@ type JobInfo = {
 
 export default function DashboardPage() {
   const router = useRouter();
-  // Mock data - replace with actual data fetching
   const [jobInfos, setJobInfos] = useState<JobInfo[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
     const fetchJobInfos = async () => {
-      const response = await fetch('/api/job-info');
-      const data = await response.json();
-      setJobInfos(data);
+      try {
+        const response = await fetch('/api/job-info');
+        if (!response.ok) throw new Error('Failed to fetch jobs');
+        const data = await response.json();
+        setJobInfos(data);
+      } catch (error) {
+        console.error('Error fetching jobs:', error);
+        // Optionally handle error state here
+      } finally {
+        setIsLoading(false);
+      }
     };
+
     fetchJobInfos();
   }, []);
+
+  if (isLoading) {
+    return (
+      <div className='flex items-center justify-center min-h-[60vh]'>
+        <Loader2 className='h-8 w-8 animate-spin text-primary' />
+      </div>
+    );
+  }
+
   return (
     <div className='container mx-auto px-4 py-8'>
       <div className='flex justify-between items-center mb-8'>
