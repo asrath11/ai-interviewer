@@ -1,14 +1,6 @@
 'use client';
 import { Button } from '@/components/ui/button';
-import {
-  ArrowLeft,
-  Loader2,
-  MessageSquare,
-  Mic,
-  FileText,
-  Edit,
-  ArrowRight,
-} from 'lucide-react';
+import { ArrowLeft, Loader2, ArrowRight } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
@@ -54,7 +46,7 @@ export default function JobInfoPage() {
   });
 
   const handleBack = () => {
-    router.back();
+    router.push('/dashboard');
   };
 
   if (isLoading) {
@@ -67,10 +59,10 @@ export default function JobInfoPage() {
 
   if (isError || !jobInfo) {
     return (
-      <div className='container my-8'>
+      <div className='m-8'>
         <Button variant='ghost' onClick={handleBack} className='mb-6'>
           <ArrowLeft className='mr-2 h-4 w-4' />
-          Back
+          Dashboard
         </Button>
         <div className='p-6 border rounded-lg'>
           <p>Failed to load job information.</p>
@@ -84,7 +76,7 @@ export default function JobInfoPage() {
       <div className='flex justify-between items-center mb-6'>
         <Button variant='ghost' onClick={handleBack}>
           <ArrowLeft className='mr-2 h-4 w-4' />
-          Back to Jobs
+          Dashboard
         </Button>
       </div>
 
@@ -104,7 +96,9 @@ export default function JobInfoPage() {
           </div>
         </div>
 
-        <div className='prose max-w-none mb-12'>{jobInfo.description}</div>
+        <div className='prose max-w-none mb-12 text-muted-foreground'>
+          {jobInfo.description}
+        </div>
 
         <div className='grid lg:grid-cols-2  gap-6'>
           {actionItems.map((item, index) => (
@@ -121,7 +115,7 @@ export default function JobInfoPage() {
                 </div>
                 <Button asChild variant='ghost'>
                   <Link href={item.href(jobInfoId)}>
-                    <ArrowRight className='h-4 w-4' />
+                    <ArrowRight className='h-7 w-7' />
                   </Link>
                 </Button>
               </CardTitle>

@@ -59,6 +59,7 @@ export function JobInfoForm() {
   async function onSubmit(data: JobFormValues) {
     try {
       setIsSubmitting(true);
+      console.log(data);
       const response = await fetch('/api/job-info', {
         method: 'POST',
         headers: {
