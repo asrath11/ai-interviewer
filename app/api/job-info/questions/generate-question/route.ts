@@ -5,17 +5,18 @@ import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/authoption';
+
 const model = google('gemini-2.0-flash'); // ⚡ Fastest flash model
 
 const RequestSchema = z.object({
   jobInfoId: z.string().min(1, "Job info ID is required"),
-  difficulty: z.enum(['easy', 'medium', 'hard']).default('medium'),
+  resumeText: z.string().min(1, "Resume text is required"),
 });
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { jobInfoId, difficulty } = RequestSchema.parse(body);
+    const { jobInfoId, resumeText } = RequestSchema.parse(body);
 
     const session = await getServerSession(authOptions);
     const userId = session?.user?.id;
@@ -23,11 +24,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // ✅ Fetch job info and verify ownership
+    // ✅ Fetch job info
     const jobInfo = await prisma.jobInfo.findFirst({
-      where: {
-        id: jobInfoId,
-      },
+      where: { id: jobInfoId },
     });
 
     if (!jobInfo) {
@@ -39,45 +38,81 @@ export async function POST(request: Request) {
 
     const description = jobInfo.description.slice(0, 500);
 
-    // ✅ Generate and stream the question
+    // ✅ Generate and stream the resume analysis
     const result = await streamText({
       model,
-      prompt: `Generate a ${difficulty} interview question for the role: ${jobInfo.title}.
-      Job description: ${description}`,
-      system: `
-You are an AI assistant that creates technical interview questions tailored to a specific job role.
-Your task is to generate **one unique, realistic, and relevant** technical question that matches the skill requirements of the job and aligns with the difficulty level provided by the user.
+      prompt: `
+You are an expert AI assistant specialized in resume analysis and job-to-resume matching.
 
-Job Information:
-- Job Description: \`${jobInfo.description}\`
-- Experience Level: \`${jobInfo.experience}\`
-${jobInfo.title ? `- Job Title: \`${jobInfo.title}\`` : ""}
+Your task is to carefully analyze the **resume** against the given **job description** and provide a **scored report** (each score out of 10).
 
-### Difficulty Guidelines
-- **Easy** → Focus mainly on **JavaScript fundamentals**, especially:
-  - let vs const, var scoping
-  - Array methods (map, filter, reduce, forEach)
-  - Promise basics & async/await
-  - Closures, hoisting, default parameters
-  - Basic DOM manipulation
-  - Event handling (click, submit, etc.)
-  - this keyword, binding, and arrow functions
-  - If frontend frameworks are mentioned, include very simple concepts (props, state, JSX).
-  - If backend technologies are mentioned, include basic concepts (CRUD operations, REST APIs, middleware).
-  - Generate unique questions that are **realistic** and **aligned with the job description**.
-- **Medium** → Create **practical, applied coding questions** using JavaScript + technologies from the job description (React, Node, DBs, APIs).
-- **Hard** → Ask **advanced, real-world challenges** (system design, architecture, optimization, debugging, scaling).
+---
 
-### Variation & Randomness
-- Never repeat the same exact question twice.
-- Vary the **topic focus** each time (e.g., one time closures, another time promises, another time array methods).
-- Use a **different format** sometimes (bullet points, code snippets, or scenario-based).
-- Randomly choose *one* concept from the appropriate difficulty bucket.
+### 🧾 Job Description
+${description}
 
-### Output Instructions
-- Return **only one unique question**, formatted in **Markdown**.
-- Do **not** include an answer or hints.
-- Stop immediately after providing the question.`,
+---
+
+### 📄 Resume
+${resumeText}
+
+---
+
+### 🔍 Provide an In-Depth Analysis Covering the Following Sections
+
+1. **ATS Compatibility (Score: X/10)**
+   - Evaluate resume structure, formatting, and parseability by Applicant Tracking Systems (ATS).
+   - Mention if tables, images, or non-standard fonts may cause parsing issues.
+   - Give a score out of 10 based on how ATS-friendly the resume is.
+
+2. **Job Match (Score: X/10)**
+   - Compare the resume’s experience, skills, and achievements to the job requirements.
+   - Evaluate alignment with the required role, experience level, and technical stack.
+   - Score how closely the candidate fits the role.
+
+3. **Keyword Relevance (Score: X/10)**
+   - Extract key terms and technologies from the job description.
+   - Identify which ones are present in the resume and which are missing.
+   - Score based on overlap and relevance.
+
+4. **Skills & Experience Alignment (Score: X/10)**
+   - Judge whether the candidate’s actual projects, achievements, and experience reflect the skills required.
+   - Mention specific strengths and weak spots.
+   - Assign a score.
+
+5. **Resume Presentation (Score: X/10)**
+   - Assess visual clarity, readability, grammar, and layout consistency.
+   - Check if the resume communicates impact effectively (quantified metrics, active verbs, etc.).
+   - Provide a score.
+
+6. **Improvement Recommendations**
+   - Give practical, specific suggestions to raise each score (e.g., add missing keywords, quantify results, fix formatting).
+   - Mention if the candidate should reframe or expand certain sections.
+
+7. **Final Evaluation Summary (in Table Form)**
+   | Category | Score (out of 10) | Key Comments |
+   |-----------|------------------|---------------|
+   | ATS Compatibility | X/10 | ... |
+   | Job Match | X/10 | ... |
+   | Keyword Relevance | X/10 | ... |
+   | Skills & Experience | X/10 | ... |
+   | Presentation | X/10 | ... |
+   | **Overall Fit** | **X/10** | ... |
+
+---
+
+### 🧠 Output Format
+- Use **Markdown** only.
+- Include section headings and bullet points.
+- Avoid JSON or code blocks.
+- Be concise yet insightful — like an HR + technical recruiter hybrid analysis.
+
+### 🎯 Goal
+Deliver a **clear, professional analysis** that helps the candidate understand:
+- How well they match the job.
+- Which areas need improvement.
+- What actions can improve their overall fit score.
+      `,
     });
 
     return createTextStreamResponse({
@@ -85,8 +120,7 @@ ${jobInfo.title ? `- Job Title: \`${jobInfo.title}\`` : ""}
     });
 
   } catch (error) {
-    console.error('Error generating question:', error);
-    return NextResponse.json({ error: 'Failed to generate question' }, { status: 500 });
+    console.error('Error generating resume analysis:', error);
+    return NextResponse.json({ error: 'Failed to analyze resume' }, { status: 500 });
   }
 }
-
