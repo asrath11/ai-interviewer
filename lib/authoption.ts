@@ -1,23 +1,25 @@
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import { prisma } from "@/lib/prisma";
-import { compare } from "bcrypt";
-import CredentialsProvider from "next-auth/providers/credentials";
-import GoogleProvider from "next-auth/providers/google";
-import type { NextAuthOptions } from "next-auth";
+import { PrismaAdapter } from '@next-auth/prisma-adapter';
+import { prisma } from '@/lib/prisma';
+import { compare } from 'bcrypt';
+import CredentialsProvider from 'next-auth/providers/credentials';
+import GoogleProvider from 'next-auth/providers/google';
+import type { NextAuthOptions } from 'next-auth';
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   session: {
-    strategy: "jwt",
+    strategy: 'jwt',
   },
   providers: [
     CredentialsProvider({
-      name: "Credentials",
+      name: 'Credentials',
       credentials: {
-        email: { label: "Email", type: "text" },
-        password: { label: "Password", type: "password" },
+        email: { label: 'Email', type: 'text' },
+        password: { label: 'Password', type: 'password' },
       },
-      async authorize(credentials: { email?: string; password?: string } | undefined) {
+      async authorize(
+        credentials: { email?: string; password?: string } | undefined
+      ) {
         if (!credentials?.email || !credentials?.password) return null;
 
         const user = await prisma.user.findUnique({
@@ -46,8 +48,8 @@ export const authOptions: NextAuthOptions = {
         token.id = user.id;
         token.email = user.email;
 
-        if (account.provider === "google") {
-          token.provider = "google";
+        if (account.provider === 'google') {
+          token.provider = 'google';
           token.accessToken = account.access_token;
           token.idToken = account.id_token;
         }
@@ -74,5 +76,4 @@ export const authOptions: NextAuthOptions = {
   pages: {
     signIn: '/signin',
   },
-
 };

@@ -83,3 +83,14 @@ model JobInfo {
   experience  Experience @default(Entry)
   description String
 }
+
+model Interview {
+  id         String   @id @default(cuid())
+  jobInfoId  String
+  userId     String
+  humeChatId String?
+  feedback   String?
+  duration   Int?
+  createdAt  DateTime @default(now())
+}
+

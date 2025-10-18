@@ -9,8 +9,8 @@ import { authOptions } from '@/lib/authoption';
 const model = google('gemini-2.0-flash'); // ⚡ Fastest flash model
 
 const RequestSchema = z.object({
-  jobInfoId: z.string().min(1, "Job info ID is required"),
-  resumeText: z.string().min(1, "Resume text is required"),
+  jobInfoId: z.string().min(1, 'Job info ID is required'),
+  resumeText: z.string().min(1, 'Resume text is required'),
 });
 
 export async function POST(request: Request) {
@@ -118,9 +118,11 @@ Deliver a **clear, professional analysis** that helps the candidate understand:
     return createTextStreamResponse({
       textStream: result.textStream,
     });
-
   } catch (error) {
     console.error('Error generating resume analysis:', error);
-    return NextResponse.json({ error: 'Failed to analyze resume' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to analyze resume' },
+      { status: 500 }
+    );
   }
 }

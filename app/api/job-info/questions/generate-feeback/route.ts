@@ -7,29 +7,29 @@ import { z } from 'zod';
 const model = google('gemini-2.0-flash'); // ⚡ Fastest Gemini model for text
 
 const RequestSchema = z.object({
-    jobInfoId: z.string().min(1, "Job info ID is required"),
-    questionText: z.string().min(1, "Question ID is required"),
-    answer: z.string().min(10, "Answer text is required for feedback"),
+  jobInfoId: z.string().min(1, 'Job info ID is required'),
+  questionText: z.string().min(1, 'Question ID is required'),
+  answer: z.string().min(10, 'Answer text is required for feedback'),
 });
 
 export async function POST(request: Request) {
-    try {
-        const body = await request.json();
-        const { jobInfoId, questionText, answer } = RequestSchema.parse(body);
+  try {
+    const body = await request.json();
+    const { jobInfoId, questionText, answer } = RequestSchema.parse(body);
 
-        const jobInfo = await prisma.jobInfo.findUnique({
-            where: { id: jobInfoId },
-        });
+    const jobInfo = await prisma.jobInfo.findUnique({
+      where: { id: jobInfoId },
+    });
 
-        if (!jobInfo) {
-            return NextResponse.json({ error: 'Job info not found' }, { status: 404 });
-        }
+    if (!jobInfo) {
+      return NextResponse.json({ error: 'Job info not found' }, { status: 404 });
+    }
 
-        const description = jobInfo.description.slice(0, 700);
+    const description = jobInfo.description.slice(0, 700);
 
-        const result = await streamText({
-            model,
-            prompt: `
+    const result = await streamText({
+      model,
+      prompt: `
 You are an AI assistant for technical interviews.  
 
 1️⃣ First, generate a **complete and correct answer** to the following interview question.  
@@ -61,13 +61,13 @@ ${answer}
 - Include the **AI’s model answer** for reference.
 - Be professional, concise, and clear.
 - Stop after providing feedback; no extra commentary.`,
-        });
+    });
 
-        return createTextStreamResponse({
-            textStream: result.textStream,
-        });
-    } catch (error: any) {
-        console.error(error);
-        return NextResponse.json({ error: error.message }, { status: 400 });
-    }
+    return createTextStreamResponse({
+      textStream: result.textStream,
+    });
+  } catch (error: any) {
+    console.error(error);
+    return NextResponse.json({ error: error.message }, { status: 400 });
+  }
 }
