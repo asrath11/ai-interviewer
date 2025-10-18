@@ -24,7 +24,7 @@ export default function Testimonials() {
 
   return (
     <section className='py-20 px-16'>
-      <div className='container'>
+      <div>
         <div className='text-center mb-16'>
           <h2 className='text-4xl font-bold text-foreground mb-4'>
             Trusted by job seekers worldwide
@@ -39,7 +39,7 @@ export default function Testimonials() {
             <Card key={index} className='h-full'>
               <CardContent className='p-8 h-full flex flex-col'>
                 <div className='text-5xl leading-none mb-6 text-muted-foreground/20'>
-                  "
+                  &quot;
                 </div>
                 <p className='text-lg text-foreground mb-6 flex-grow'>
                   {testimonial.quote}

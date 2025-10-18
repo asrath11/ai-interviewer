@@ -4,7 +4,7 @@ import Link from 'next/link';
 export default function Hero() {
   return (
     <section className='relative overflow-hidden py-20 sm:py-32 px-16'>
-      <div className='container'>
+      <div>
         <div className='text-center'>
           <h2 className='text-4xl sm:text-6xl font-bold text-foreground mb-6 leading-tight'>
             Land your dream job with{' '}

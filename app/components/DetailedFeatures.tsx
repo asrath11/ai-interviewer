@@ -3,7 +3,7 @@ import { Brain } from 'lucide-react';
 export default function DetailedFeatures() {
   return (
     <section className='py-20 bg-muted/20'>
-      <div className='container px-16'>
+      <div className='px-16'>
         <div className='grid grid-cols-1 lg:grid-cols-2 gap-16 items-center'>
           <div>
             <div className='text-muted-foreground text-sm font-medium mb-4'>

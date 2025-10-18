@@ -48,7 +48,7 @@ export default function Pricing() {
 
   return (
     <section className='py-20 bg-muted/20'>
-      <div className='container px-16'>
+      <div className='px-16'>
         <div className='text-center mb-16'>
           <h2 className='text-4xl font-bold text-foreground mb-4'>
             Simple, transparent pricing

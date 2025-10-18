@@ -8,7 +8,7 @@ export default function Stats() {
 
   return (
     <section className='py-20 bg-primary/5'>
-      <div className='container px-16'>
+      <div className='px-16'>
         <div className='grid grid-cols-2 md:grid-cols-4 gap-8 text-center'>
           {stats.map((stat, index) => (
             <div key={index} className='p-6'>
