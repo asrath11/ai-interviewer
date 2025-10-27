@@ -1,5 +1,3 @@
-'use client';
-import { Suspense } from 'react';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Features from './components/Features';
@@ -11,7 +9,7 @@ import Footer from './components/Footer';
 
 export default function LandingPage() {
   return (
-    <div className='bg-gradient-to-b from-background to-muted/20'>
+    <>
       <Navbar />
       <Hero />
       <Features />
@@ -20,6 +18,6 @@ export default function LandingPage() {
       <Testimonials />
       <Pricing />
       <Footer />
-    </div>
+    </>
   );
 }

@@ -2,10 +2,9 @@
 import { Button } from '@/components/ui/button';
 import { Suspense } from 'react';
 import { signIn } from 'next-auth/react';
-import { BrainCircuitIcon } from 'lucide-react';
 import NavButton from './NavButton';
-import Link from 'next/link';
 import { ToggleTheme } from '@/components/ToggleTheme';
+import VocaiLogo from '@/components/VocaiLogo';
 
 export default function Navbar() {
   return (
@@ -13,10 +12,7 @@ export default function Navbar() {
       <div>
         <div className='flex justify-between items-center h-16'>
           {/* Left: Logo */}
-          <Link href='/' className='flex items-center gap-2'>
-            <BrainCircuitIcon className='size-8 text-primary' />
-            <h1 className='text-2xl font-bold text-foreground'>Landr</h1>
-          </Link>
+          <VocaiLogo />
 
           {/* Right: Nav + Theme */}
           <div className='flex items-center gap-4'>

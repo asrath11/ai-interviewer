@@ -6,17 +6,17 @@ import { z } from 'zod';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/authoption';
 
-const model = google('gemini-2.0-flash'); // ⚡ Fastest flash model
+const model = google('gemini-2.0-flash'); // ⚡ Fast, cost-efficient
 
 const RequestSchema = z.object({
   jobInfoId: z.string().min(1, 'Job info ID is required'),
-  resumeText: z.string().min(1, 'Resume text is required'),
+  difficulty: z.enum(['easy', 'medium', 'hard']),
 });
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { jobInfoId, resumeText } = RequestSchema.parse(body);
+    const { jobInfoId, difficulty } = RequestSchema.parse(body);
 
     const session = await getServerSession(authOptions);
     const userId = session?.user?.id;
@@ -36,82 +36,112 @@ export async function POST(request: Request) {
       );
     }
 
-    const description = jobInfo.description.slice(0, 500);
+    const description = jobInfo.description.slice(0, 600);
 
-    // ✅ Generate and stream the resume analysis
+    // ✅ Generate and stream coding interview questions
     const result = await streamText({
       model,
       prompt: `
-You are an expert AI assistant specialized in resume analysis and job-to-resume matching.
-
-Your task is to carefully analyze the **resume** against the given **job description** and provide a **scored report** (each score out of 10).
+You are an **AI technical interviewer**. Your role is to generate a **coding challenge** that accurately tests a developer's practical and conceptual ability according to the given difficulty level and job description.
 
 ---
 
-### 🧾 Job Description
+### 🧾 Job Description (trimmed)
 ${description}
 
 ---
 
-### 📄 Resume
-${resumeText}
+### 🎚️ Difficulty
+${difficulty.toUpperCase()}
 
 ---
 
-### 🔍 Provide an In-Depth Analysis Covering the Following Sections
-
-1. **ATS Compatibility (Score: X/10)**
-   - Evaluate resume structure, formatting, and parseability by Applicant Tracking Systems (ATS).
-   - Mention if tables, images, or non-standard fonts may cause parsing issues.
-   - Give a score out of 10 based on how ATS-friendly the resume is.
-
-2. **Job Match (Score: X/10)**
-   - Compare the resume’s experience, skills, and achievements to the job requirements.
-   - Evaluate alignment with the required role, experience level, and technical stack.
-   - Score how closely the candidate fits the role.
-
-3. **Keyword Relevance (Score: X/10)**
-   - Extract key terms and technologies from the job description.
-   - Identify which ones are present in the resume and which are missing.
-   - Score based on overlap and relevance.
-
-4. **Skills & Experience Alignment (Score: X/10)**
-   - Judge whether the candidate’s actual projects, achievements, and experience reflect the skills required.
-   - Mention specific strengths and weak spots.
-   - Assign a score.
-
-5. **Resume Presentation (Score: X/10)**
-   - Assess visual clarity, readability, grammar, and layout consistency.
-   - Check if the resume communicates impact effectively (quantified metrics, active verbs, etc.).
-   - Provide a score.
-
-6. **Improvement Recommendations**
-   - Give practical, specific suggestions to raise each score (e.g., add missing keywords, quantify results, fix formatting).
-   - Mention if the candidate should reframe or expand certain sections.
-
-7. **Final Evaluation Summary (in Table Form)**
-   | Category | Score (out of 10) | Key Comments |
-   |-----------|------------------|---------------|
-   | ATS Compatibility | X/10 | ... |
-   | Job Match | X/10 | ... |
-   | Keyword Relevance | X/10 | ... |
-   | Skills & Experience | X/10 | ... |
-   | Presentation | X/10 | ... |
-   | **Overall Fit** | **X/10** | ... |
+### 🧠 Instructions
+Generate **exactly one coding challenge** that:
+- Matches the candidate’s target difficulty.
+- Is **relevant to the job’s tech stack** (e.g., frontend/backend or full-stack context).
+- Requires writing **actual code** (not multiple-choice or theoretical answers).
+- Includes **clear input/output requirements** and **at least one sample test case**.
+- Specifies the **expected time complexity**.
+- Explains **what concepts or reasoning a strong solution should show**.
+- Output should be in **clean Markdown**, **no JSON**.
 
 ---
 
-### 🧠 Output Format
-- Use **Markdown** only.
-- Include section headings and bullet points.
-- Avoid JSON or code blocks.
-- Be concise yet insightful — like an HR + technical recruiter hybrid analysis.
+### 🎯 Difficulty Guidelines
 
-### 🎯 Goal
-Deliver a **clear, professional analysis** that helps the candidate understand:
-- How well they match the job.
-- Which areas need improvement.
-- What actions can improve their overall fit score.
+**Easy (JavaScript Foundations):**
+Focus on core JavaScript concepts such as:
+- Variables: \`var\`, \`let\`, \`const\`
+- Scope and closures
+- Arrays and strings (map, filter, reduce, loops)
+- Async basics (\`setTimeout\`, \`async/await\`, Promises)
+- Conditional logic and functions (including arrow functions)
+- Simple DOM or event-based tasks (if frontend-related)
+
+Example types of problems:
+- Reverse a string without using built-in methods
+- Count occurrences of words in a sentence
+- Implement a delay function using Promises
+- Toggle a button’s text on click (frontend)
+
+---
+
+**Medium (Scenario-Based: Frontend + Backend):**
+Focus on **real-world application-level coding** — both frontend and backend.
+- **Frontend:** React/DOM logic, event handling, state management, API fetching, debouncing, etc.
+- **Backend:** Express.js route logic, asynchronous data flow, API rate limiting, error handling, data manipulation.
+
+Example types of problems:
+- Implement a custom debounce hook in React.
+- Build a simple Express.js endpoint that paginates data.
+- Create a function to merge and sort two API responses.
+- Implement a simple localStorage caching utility for fetched data.
+
+These questions should simulate real coding scenarios — not purely algorithmic puzzles.
+
+---
+
+**Hard (Advanced/Systems & Algorithms):**
+Focus on complex design or optimization challenges:
+- Advanced algorithms (graphs, DP, concurrency)
+- Full-stack system design
+- Complex async coordination, caching, or rate limiting
+- Optimized backend logic or distributed workflows
+
+---
+
+### 🧾 Output Format
+
+#### Coding Challenge
+**Title:**  
+**Difficulty:** ${difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}
+
+**Problem Description:**  
+(Explain the problem clearly and specify the goal.)
+
+**Function Signature (if applicable):**  
+\`\`\`js
+function solve(input) {
+  // Your code here
+}
+\`\`\`
+
+**Input Example:**  
+\`\`\`
+<example input>
+\`\`\`
+
+**Output Example:**  
+\`\`\`
+<example output>
+\`\`\`
+
+**Expected Time Complexity:**  
+O(...)
+
+**Strong Solution Should Include:**  
+(Explain what key concepts or patterns an ideal answer should demonstrate.)
       `,
     });
 
@@ -119,9 +149,9 @@ Deliver a **clear, professional analysis** that helps the candidate understand:
       textStream: result.textStream,
     });
   } catch (error) {
-    console.error('Error generating resume analysis:', error);
+    console.error('Error generating coding problem:', error);
     return NextResponse.json(
-      { error: 'Failed to analyze resume' },
+      { error: 'Failed to generate coding problem' },
       { status: 500 }
     );
   }

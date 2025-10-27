@@ -2,7 +2,6 @@
 
 import {
   BookOpenIcon,
-  BrainCircuitIcon,
   FileSlidersIcon,
   LogOut,
   SpeechIcon,
@@ -20,6 +19,7 @@ import { UserAvatar } from '@/components/UserAvatar';
 import { useParams, usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { signOut } from 'next-auth/react';
+import VocaiLogo from '@/components/VocaiLogo';
 
 const navLinks = [
   { name: 'Interviews', href: 'interviews', Icon: SpeechIcon },
@@ -33,11 +33,7 @@ export function Navbar({ user }: { user: { name: string; imageUrl: string } }) {
   return (
     <nav className='h-header border-b'>
       <div className='flex h-full items-center justify-between px-10'>
-        <Link href='/dashboard' className='flex items-center gap-2'>
-          <BrainCircuitIcon className='size-8 text-primary' />
-          <span className='text-xl font-bold'>Landr</span>
-        </Link>
-
+        <VocaiLogo />
         <div className='flex items-center gap-4'>
           {typeof jobInfoId === 'string' &&
             navLinks.map(({ name, href, Icon }) => {
