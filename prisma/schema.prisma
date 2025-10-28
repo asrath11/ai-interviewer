@@ -90,7 +90,6 @@ model Interview {
   userId     String
   humeChatId String?
   feedback   String?
-  duration   Int?
+  duration   String?
   createdAt  DateTime @default(now())
 }
-

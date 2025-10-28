@@ -7,13 +7,12 @@ export function CondensedMessages({ messages }: { messages: any[] }) {
     (msg) => msg.type === 'assistant_message' || msg.type === 'user_message'
   );
   return (
-    <div className='space-y-4 flex flex-col justify-center items-center h-full gap-4 w-6xl'>
+    <div className='space-y-4 flex flex-col justify-end h-screen mx-auto gap-4 w-6xl'>
       {filteredMessages.map((msg, i) => {
         const text = msg.message?.content || msg.transcript || '…';
         const audioUrl = msg.audio?.url;
         const isUser = msg.type === 'user_message';
         const isAssistant = msg.type === 'assistant_message';
-
         return (
           <div
             key={i}

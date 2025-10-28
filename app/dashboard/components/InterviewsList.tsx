@@ -1,27 +1,20 @@
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Calendar, Clock } from 'lucide-react';
+import Link from 'next/link';
 
 type Interview = {
   id: string;
   createdAt: Date;
-  duration: number | null;
+  duration: string | null;
+  jobInfoId: string;
 };
 
-export default function InterviewsList({ interviews }: { interviews: Interview[] }) {
-  const formatDuration = (seconds: number | null) => {
-    if (seconds == null || Number.isNaN(seconds)) return '00:00:00';
-    const hrs = Math.floor(seconds / 3600)
-      .toString()
-      .padStart(2, '0');
-    const mins = Math.floor((seconds % 3600) / 60)
-      .toString()
-      .padStart(2, '0');
-    const secs = Math.floor(seconds % 60)
-      .toString()
-      .padStart(2, '0');
-    return `${hrs}:${mins}:${secs}`;
-  };
+export default function InterviewsList({
+  interviews,
+}: {
+  interviews: Interview[];
+}) {
   return (
     <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
       {interviews.map((interview) => (
@@ -47,12 +40,16 @@ export default function InterviewsList({ interviews }: { interviews: Interview[]
               </div>
               <div className='flex items-center gap-2 text-muted-foreground'>
                 <Clock className='h-4 w-4' />
-                <span>{formatDuration(interview.duration)}</span>
+                <span>{interview.duration || '00:00:00'} </span>
               </div>
             </div>
 
             <Button variant='outline' className='flex items-center gap-2'>
-              View
+              <Link
+                href={`/dashboard/job-infos/${interview.jobInfoId}/interviews/${interview.id}`}
+              >
+                View
+              </Link>
               <ArrowRight className='h-4 w-4' />
             </Button>
           </div>
