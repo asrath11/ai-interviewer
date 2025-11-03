@@ -18,7 +18,7 @@ export default async function InterviewPage({
   const { jobInfoId } = await params;
 
   const interviews = await prisma.interview.findMany({
-    where: { userId: session.user.id, jobInfoId },
+    where: { userId: session.user.id, jobInfoId: jobInfoId },
     orderBy: { createdAt: 'desc' },
   });
 

@@ -2,7 +2,7 @@
 export interface JobInfo {
   id: string;
   name: string;
-  title: string;
+  title?: string;
   description?: string;
   experience?: 'Entry' | 'Mid' | 'Senior';
 }

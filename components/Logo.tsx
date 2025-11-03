@@ -7,113 +7,13 @@ type LogoProps = {
 function Logo({ className }: LogoProps) {
   return (
     <svg
-      className={className}
-      width='100%'
-      height='100%'
-      viewBox='0 0 200 200'
+      fill='#FF6720'
+      role='img'
+      viewBox='0 0 24 24'
       xmlns='http://www.w3.org/2000/svg'
     >
-      <defs>
-        {/* Main glowing gradient */}
-        <linearGradient id='mainGradient' x1='0%' y1='0%' x2='100%' y2='100%'>
-          <stop offset='0%' stopColor='#6a11cb' />
-          <stop offset='100%' stopColor='#2575fc' />
-        </linearGradient>
-
-        {/* Reverse gradient for inner elements */}
-        <linearGradient id='innerGradient' x1='100%' y1='0%' x2='0%' y2='100%'>
-          <stop offset='0%' stopColor='#2575fc' />
-          <stop offset='100%' stopColor='#6a11cb' />
-        </linearGradient>
-
-        {/* Glow effect */}
-        <filter id='glow' x='-50%' y='-50%' width='200%' height='200%'>
-          <feGaussianBlur in='SourceGraphic' stdDeviation='5' result='blur' />
-          <feMerge>
-            <feMergeNode in='blur' />
-            <feMergeNode in='SourceGraphic' />
-          </feMerge>
-        </filter>
-
-        {/* Animation for shimmer */}
-        <linearGradient id='shimmer' x1='0%' y1='0%' x2='200%' y2='0%'>
-          <stop offset='0%' stopColor='#ffffff00' />
-          <stop offset='50%' stopColor='#ffffff55' />
-          <stop offset='100%' stopColor='#ffffff00' />
-          <animate
-            attributeName='x1'
-            values='0%;200%'
-            dur='3s'
-            repeatCount='indefinite'
-          />
-          <animate
-            attributeName='x2'
-            values='100%;300%'
-            dur='3s'
-            repeatCount='indefinite'
-          />
-        </linearGradient>
-
-        <style>
-          {`
-        .pulse {
-          transform-origin: center;
-          animation: pulse 2.5s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-          0%, 100% { transform: scale(1); opacity: 1; }
-          50% { transform: scale(1.08); opacity: 0.85; }
-        }
-      `}
-        </style>
-      </defs>
-
-      {/* Outer flow curve */}
-      <path
-        d='M40 100 C60 50, 80 150, 100 100 C120 50, 140 150, 160 100'
-        stroke='url(#mainGradient)'
-        strokeWidth='8'
-        fill='none'
-        strokeLinecap='round'
-        filter='url(#glow)'
-      />
-
-      {/* Inner neural web */}
-      <g stroke='url(#innerGradient)' strokeWidth='3' fill='none'>
-        {/* Core circle */}
-        <circle
-          cx='100'
-          cy='100'
-          r='18'
-          fill='url(#innerGradient)'
-          className='pulse'
-        />
-
-        {/* Corner nodes */}
-        <circle cx='70' cy='80' r='8' fill='url(#innerGradient)' />
-        <circle cx='130' cy='80' r='8' fill='url(#innerGradient)' />
-        <circle cx='70' cy='120' r='8' fill='url(#innerGradient)' />
-        <circle cx='130' cy='120' r='8' fill='url(#innerGradient)' />
-
-        {/* Connections */}
-        <line x1='100' y1='100' x2='70' y2='80' />
-        <line x1='100' y1='100' x2='130' y2='80' />
-        <line x1='100' y1='100' x2='70' y2='120' />
-        <line x1='100' y1='100' x2='130' y2='120' />
-        <line x1='70' y1='80' x2='130' y2='80' />
-        <line x1='70' y1='120' x2='130' y2='120' />
-        <line x1='70' y1='80' x2='70' y2='120' />
-        <line x1='130' y1='80' x2='130' y2='120' />
-      </g>
-
-      {/* Accent spark dots */}
-      <g fill='url(#shimmer)' filter='url(#glow)'>
-        <circle cx='60' cy='84' r='3' />
-        <circle cx='80' cy='116' r='3' />
-        <circle cx='120' cy='84' r='3' />
-        <circle cx='140' cy='116' r='3' />
-      </g>
+      <title>UserVoice</title>
+      <path d='m17.449 0-3.892 2.672V16.8c0 1.34-.647 2.527-1.635 3.253-.937-.768-1.479-1.994-1.479-3.253V16c0-.8-.778-1.6-.778-2.4 0-.556.376-1.112.606-1.669.11-.219.172-.467.172-.73 0-.885-.696-1.601-1.556-1.601-.86 0-1.557.716-1.557 1.6 0 .264.063.512.173.731.23.557.606 1.113.606 1.67 0 .8-.78 1.6-.78 2.4v.799c0 1.442.429 2.741 1.183 3.821-1.585-.506-2.738-2.028-2.738-3.821V16c0-.8-.779-1.6-.779-2.4 0-.556.376-1.112.605-1.669.11-.219.174-.467.174-.73 0-.885-.698-1.601-1.558-1.601-.86 0-1.556.716-1.556 1.6 0 .264.063.512.174.731.229.557.604 1.113.604 1.67 0 .8-.778 1.6-.778 2.4v.799c0 3.97 3.142 7.2 7.005 7.2s7.006-3.23 7.006-7.2V4.224l.778-.528.778.528V16.64c0 2.653-.778 5.325-3.736 7.2 3.012 0 6.762-3.48 6.85-7.999V2.671zM4.216.96c-.86 0-1.556.717-1.556 1.6 0 .884.696 1.6 1.556 1.6s1.557-.716 1.557-1.6c0-.883-.697-1.6-1.557-1.6zm4.67 0c-.86 0-1.557.717-1.557 1.6 0 .884.698 1.6 1.558 1.6.86 0 1.556-.716 1.556-1.6 0-.883-.697-1.6-1.556-1.6zm-4.67 4.32c-.86 0-1.556.717-1.556 1.6s.696 1.6 1.556 1.6 1.557-.716 1.557-1.6-.697-1.6-1.557-1.6zm4.67 0c-.86 0-1.557.717-1.557 1.6s.698 1.6 1.558 1.6c.86 0 1.556-.716 1.556-1.6s-.697-1.6-1.556-1.6z' />
     </svg>
   );
 }

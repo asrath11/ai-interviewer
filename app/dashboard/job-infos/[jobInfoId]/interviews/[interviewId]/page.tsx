@@ -1,74 +1,62 @@
-'use client';
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
-import axios from 'axios';
-import { Loader2 as Loader2Icon } from 'lucide-react';
 import { Messages } from '@/components/interview/Messages';
+import { getInterview } from '@/services/api/interview';
+import { getInterviewMessages } from '@/services/api/message';
+import { sampleMessages } from '@/components/interview/sampleMessages';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { ArrowLeftIcon } from 'lucide-react';
 
-export default function InterviewPage() {
-  const params = useParams();
-  const { interviewId } = params as { interviewId: string };
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [messages, setMessages] = useState<any[]>([]);
-  console.log(messages);
+export default async function InterviewPage({
+  params,
+}: {
+  params: Promise<{ jobInfoId: string; interviewId: string }>;
+}) {
+  const resolvedParams = await params;
+  const interview = await getInterview(resolvedParams.interviewId);
+  const createdAt = new Date(interview.createdAt);
 
-  useEffect(() => {
-    if (!interviewId) return;
-    let cancelled = false;
-    (async () => {
-      try {
-        const { data: interview } = await axios.get(
-          `/api/interviews/${interviewId}`
-        );
-        const chatId: string | undefined | null = interview?.humeChatId;
-        if (!chatId) {
-          if (!cancelled) setError('No transcript available');
-          return;
-        }
-        const { data: events } = await axios.get(`/api/hume/messages`, {
-          params: { chatId },
-        });
-        if (!cancelled) {
-          const mapped = (events as any[])
-            .filter(
-              (e) => e?.type === 'AGENT_MESSAGE' || e?.type === 'USER_MESSAGE'
-            )
-            .map((e) => ({
-              type: e.role === 'AGENT' ? 'assistant_message' : 'user_message',
-              transcript: e.messageText,
-              message: { content: e.messageText },
-            }));
-          setMessages(mapped);
-        }
-      } catch (e: any) {
-        if (!cancelled) setError('Failed to load transcript');
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [interviewId]);
-
-  if (loading) {
-    return (
-      <div className='h-[calc(100vh-80px)] flex flex-col items-center justify-center gap-4'>
-        <Loader2Icon className='animate-spin' size={48} />
-        <div className='text-sm text-muted-foreground'>Loading transcript...</div>
-      </div>
-    );
+  if (!interview.id) {
+    throw new Error('No transcript available');
   }
 
+  const messages = await getInterviewMessages(interview.id);
+  // const messages = sampleMessages;
+
   return (
-    <div className='h-[calc(100vh-80px)] overflow-y-auto'>
-      {error && (
-        <div className='p-4 text-center text-red-500 text-sm'>{error}</div>
-      )}
-      <div className='py-6 mx-auto flex flex-col items-center gap-4 w-full'>
-        <Messages messages={messages} />
+    <div className='h-[calc(100vh-80px)] overflow-y-auto p-6'>
+      <div className='mb-6 w-fit'>
+        <Button
+          asChild
+          variant='ghost'
+          className='flex items-center gap-2 text-muted-foreground'
+        >
+          <Link
+            href={`/dashboard/job-infos/${resolvedParams.jobInfoId}/interviews`}
+          >
+            <ArrowLeftIcon className='size-5' />
+            All Interviews
+          </Link>
+        </Button>
       </div>
+      <p className='text-2xl font-semibold mb-6'>
+        Interview:{' '}
+        <span className='text-muted-foreground'>
+          {createdAt.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+          })}
+        </span>
+        <span className='text-muted-foreground ml-2'>
+          {createdAt.toLocaleTimeString('en-US', {
+            hour: 'numeric',
+            minute: 'numeric',
+            second: 'numeric',
+          })}
+        </span>
+      </p>
+
+      <Messages messages={messages} />
     </div>
   );
 }

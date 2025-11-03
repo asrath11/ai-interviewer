@@ -3,14 +3,15 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/authoption';
 import { prisma } from '@/lib/prisma';
+import { getToken } from 'next-auth/jwt';
 
 export async function PUT(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
+    const Token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+    if (!Token) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -33,7 +34,7 @@ export async function PUT(
       where: { id: interviewId },
     });
 
-    if (!interview || interview.userId !== session.user.id) {
+    if (!interview || interview.userId !== Token.id) {
       return NextResponse.json({ error: 'Not found' }, { status: 404 });
     }
 
@@ -59,14 +60,14 @@ export async function PUT(
 }
 
 export async function GET(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    // const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+    // if (!token) {
+    //   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    // }
 
     // ✅ Await params first, THEN destructure
     const resolvedParams = await params;
@@ -76,7 +77,7 @@ export async function GET(
       where: { id: interviewId },
     });
 
-    if (!interview || interview.userId !== session.user.id) {
+    if (!interview) {
       return NextResponse.json({ error: 'Not found' }, { status: 404 });
     }
 

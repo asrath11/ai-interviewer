@@ -44,13 +44,12 @@ export default function InterviewsList({
               </div>
             </div>
 
-            <Button variant='outline' className='flex items-center gap-2'>
+            <Button asChild variant='outline' className='flex items-center gap-2'>
               <Link
                 href={`/dashboard/job-infos/${interview.jobInfoId}/interviews/${interview.id}`}
               >
-                View
+                View <ArrowRight className='h-4 w-4' />
               </Link>
-              <ArrowRight className='h-4 w-4' />
             </Button>
           </div>
         </Card>

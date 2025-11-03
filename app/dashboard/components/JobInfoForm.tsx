@@ -25,6 +25,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react'; // 👈 import NextAuth hook
 
 const jobFormSchema = z.object({
   name: z.string().min(2, {
@@ -39,42 +40,52 @@ const jobFormSchema = z.object({
 
 type JobFormValues = z.infer<typeof jobFormSchema>;
 
-// Default values
 const defaultValues: Partial<JobFormValues> = {
   name: '',
-  title: '',
   experience: 'Entry',
   description: '',
 };
 
-export function JobInfoForm() {
+type JobInfoFormProps = {
+  initialValues?: Partial<JobFormValues>;
+  onSubmit?: (data: JobFormValues & { userId: string }) => Promise<void> | void;
+  submitLabel?: string;
+};
+
+export function JobInfoForm({
+  initialValues,
+  onSubmit,
+  submitLabel,
+}: JobInfoFormProps) {
   const router = useRouter();
+  const { data: session } = useSession(); // 👈 get logged-in user
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<JobFormValues>({
     resolver: zodResolver(jobFormSchema),
-    defaultValues,
+    defaultValues: { ...defaultValues, ...initialValues },
   });
 
-  async function onSubmit(data: JobFormValues) {
+  async function handleCreate(data: JobFormValues) {
     try {
       setIsSubmitting(true);
-      console.log(data);
+
+      // ✅ Include userId from session
+      const payload = {
+        ...data,
+        userId: session?.user?.id, // 👈 attach userId automatically
+      };
+
       const response = await fetch('/api/job-info', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to create job');
-      }
+      if (!response.ok) throw new Error('Failed to create job');
 
-      // Redirect to dashboard after successful creation
       router.push('/dashboard');
-      router.refresh(); // Refresh the dashboard to show the new job
+      router.refresh();
     } catch (error) {
       console.error('Error creating job:', error);
     } finally {
@@ -89,7 +100,21 @@ export function JobInfoForm() {
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
+          <form
+            onSubmit={form.handleSubmit(async (data) => {
+              if (!session?.user?.id) {
+                alert('User not authenticated!');
+                return;
+              }
+
+              if (onSubmit) {
+                await onSubmit({ ...data, userId: session.user.id });
+              } else {
+                await handleCreate(data);
+              }
+            })}
+            className='space-y-8'
+          >
             <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
               <FormField
                 control={form.control}
@@ -113,7 +138,7 @@ export function JobInfoForm() {
                 name='title'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Job Title(Optional)</FormLabel>
+                    <FormLabel>Job Title (Optional)</FormLabel>
                     <FormControl>
                       <Input placeholder='Job Title' {...field} />
                     </FormControl>
@@ -184,7 +209,11 @@ export function JobInfoForm() {
               size='lg'
               disabled={isSubmitting}
             >
-              {isSubmitting ? 'Creating...' : 'Create Job Info'}
+              {isSubmitting
+                ? submitLabel
+                  ? `${submitLabel}...`
+                  : 'Saving...'
+                : submitLabel || 'Create Job Info'}
             </Button>
           </form>
         </Form>
