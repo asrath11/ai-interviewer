@@ -61,8 +61,7 @@ export default function Signup() {
 
   const onSubmit = async (values: SignupFormValues) => {
     try {
-      const response = await axios.post('/api/auth/signup', values);
-      console.log(response.data);
+      await axios.post('/api/auth/signup', values);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         setError(error.response?.data?.error || 'Something went wrong');

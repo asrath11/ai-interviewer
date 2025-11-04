@@ -64,7 +64,6 @@ export default function Signin() {
         password: values.password,
         redirect: false,
       });
-      console.log(res);
       if (res?.error) {
         setError('Invalid email or password');
         return;

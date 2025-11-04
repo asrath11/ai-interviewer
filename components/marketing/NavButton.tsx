@@ -4,7 +4,6 @@ import Link from 'next/link';
 
 export function NavButton() {
   const session = useSession();
-  console.log(session);
 
   if (session.data?.user == null) {
     return (

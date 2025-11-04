@@ -17,7 +17,6 @@ export async function PUT(
     const interviewId = resolvedParams.id;
 
     const { humeChatId, duration } = await req.json();
-    console.log(humeChatId, duration);
 
     if (!humeChatId) {
       return NextResponse.json(
