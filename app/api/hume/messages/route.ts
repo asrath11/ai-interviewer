@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
 
     const events = await fetchChatMessages(chatId);
     return NextResponse.json(events);
-  } catch (e) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to fetch chat messages' },
       { status: 500 }

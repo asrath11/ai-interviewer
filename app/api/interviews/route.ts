@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json(interview, { status: 201 });
-  } catch (e) {
+  } catch {
     return NextResponse.json({ error: 'Failed to create interview' }, { status: 500 });
   }
 }

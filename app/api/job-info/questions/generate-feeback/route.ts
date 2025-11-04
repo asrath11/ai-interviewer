@@ -1,5 +1,5 @@
 import { google } from '@/services/ai/models/google';
-import { streamText, createTextStreamResponse } from 'ai';
+import { streamText } from 'ai';
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
@@ -27,7 +27,7 @@ export async function POST(request: Request) {
 
     const description = jobInfo.description.slice(0, 700);
 
-    const result = await streamText({
+const result = await streamText({
       model,
       prompt: `
 You are an **AI Interview Evaluator**.  
@@ -83,9 +83,24 @@ ${answer}
 - Do not include any commentary outside this format.`,
     });
 
-    return result.toTextStreamResponse();
-  } catch (error: any) {
-    console.error('Error generating feedback:', error);
-    return NextResponse.json({ error: error.message }, { status: 400 });
+    return new Response(result.textStream);
+  } catch (error: unknown) {
+    console.error('Error generating feedback:');
+    let errorMessage = 'Failed to generate feedback';
+    
+    if (error instanceof Error) {
+      console.error(error.message);
+      errorMessage = error.message;
+    } else if (typeof error === 'string') {
+      console.error(error);
+      errorMessage = error;
+    } else {
+      console.error('An unknown error occurred');
+    }
+    
+    return NextResponse.json(
+      { error: errorMessage },
+      { status: 500 }
+    );
   }
 }

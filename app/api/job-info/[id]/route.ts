@@ -1,22 +1,29 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 
-interface Params {
-  params: { id: string };
-}
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    const jobInfo = await prisma.jobInfo.findUnique({
+      where: { id },
+    });
 
-export async function GET(request: Request, { params }: Params) {
-  const { id } = await params;
-  const jobInfo = await prisma.jobInfo.findUnique({
-    where: { id: id },
-  });
+    if (!jobInfo) {
+      return NextResponse.json({ error: 'Job not found' }, { status: 404 });
+    }
 
-  if (!jobInfo) {
-    return NextResponse.json({ error: 'Job not found' }, { status: 404 });
+    return NextResponse.json(jobInfo);
+  } catch (error) {
+    console.error('Error fetching job info:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch job info' },
+      { status: 500 }
+    );
   }
-
-  return NextResponse.json(jobInfo);
 }
 
 const JobInfoSchema = z.object({
@@ -28,30 +35,54 @@ const JobInfoSchema = z.object({
   experience: z.enum(['Entry', 'Mid', 'Senior']),
 });
 
-export async function PUT(request: Request, { params }: Params) {
-  const { id } = await params;
-  const body = await request.json();
-  const parsedBody = JobInfoSchema.safeParse(body);
-  if (!parsedBody.success) {
-    return NextResponse.json({ error: parsedBody.error }, { status: 400 });
-  }
-
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
+    const { id } = await params;
+    const body = await request.json();
+
+    // Validate request body
+    const validation = JobInfoSchema.safeParse(body);
+    if (!validation.success) {
+      const errorMessage = validation.error.message || 'Invalid request body';
+      return NextResponse.json({ error: errorMessage }, { status: 400 });
+    }
+
+    const validatedData = validation.data;
+
+    // Check if job exists
+    const existingJob = await prisma.jobInfo.findUnique({
+      where: { id },
+    });
+
+    if (!existingJob) {
+      return NextResponse.json({ error: 'Job not found' }, { status: 404 });
+    }
+
+    // Update the job
     const updated = await prisma.jobInfo.update({
       where: { id },
-      data: body,
+      data: validatedData,
     });
+
     return NextResponse.json(updated);
-  } catch (e) {
-    return NextResponse.json({ error: 'Job not found' }, { status: 404 });
+  } catch (error) {
+    console.error('Error updating job:', error);
+    return NextResponse.json({ error: 'Failed to update job' }, { status: 500 });
   }
 }
 
-export async function DELETE(request: Request, { params }: Params) {
-  const { id } = await params;
-
+// FIXED: Add the request parameter even if not used
+export async function DELETE(
+  request: NextRequest, // Add this parameter
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
-    // First, check if the job info exists and belongs to the user
+    const { id } = await params;
+
+    // First, check if the job info exists
     const jobInfo = await prisma.jobInfo.findUnique({
       where: { id },
     });
@@ -65,9 +96,9 @@ export async function DELETE(request: Request, { params }: Params) {
       where: { id },
     });
 
-    return NextResponse.json({ success: true });
-  } catch (e) {
-    console.error('Error deleting job info:', e);
+    return new NextResponse(null, { status: 204 });
+  } catch (error) {
+    console.error('Error deleting job info:', error);
     return NextResponse.json(
       { error: 'Failed to delete job info' },
       { status: 500 }

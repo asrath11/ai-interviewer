@@ -1,7 +1,6 @@
 import { Messages } from '@/components/interview/Messages';
 import { getInterview } from '@/services/api/interview';
 import { getInterviewMessages } from '@/services/api/message';
-import { sampleMessages } from '@/components/interview/sampleMessages';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ArrowLeftIcon } from 'lucide-react';

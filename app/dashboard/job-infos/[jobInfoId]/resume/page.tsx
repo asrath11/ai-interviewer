@@ -144,7 +144,7 @@ export default function ResumeUpload() {
             </div>
           )}
         </Card>
-        {aiAnalysis && <Analysis obj={aiAnalysis} />}
+        {aiAnalysis && <Analysis obj={aiAnalysis as any} />}
       </div>
     </div>
   );

@@ -37,7 +37,7 @@ const actionItems = [
 export default function JobInfoPage() {
   const router = useRouter();
   const { jobInfoId } = useParams<{ jobInfoId: string }>();
-  const { data: session, status } = useSession();
+  const { status } = useSession();
 
   const {
     data: jobInfo,

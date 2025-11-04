@@ -1,7 +1,4 @@
-// app/api/interviews/[id]/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/lib/authoption';
 import { prisma } from '@/lib/prisma';
 import { getToken } from 'next-auth/jwt';
 
@@ -50,10 +47,11 @@ export async function PUT(
     });
 
     return NextResponse.json({ ok: true });
-  } catch (e: any) {
-    console.error('PUT Error:', e);
+  } catch (error: unknown) {
+    console.error('PUT Error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Failed to update interview';
     return NextResponse.json(
-      { error: e.message || 'Failed to update interview' },
+      { error: errorMessage },
       { status: 500 }
     );
   }
@@ -82,10 +80,11 @@ export async function GET(
     }
 
     return NextResponse.json(interview);
-  } catch (e) {
-    console.error('GET Error:', e);
+  } catch (error: unknown) {
+    console.error('GET Error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Failed to fetch interview';
     return NextResponse.json(
-      { error: 'Failed to fetch interview' },
+      { error: errorMessage },
       { status: 500 }
     );
   }

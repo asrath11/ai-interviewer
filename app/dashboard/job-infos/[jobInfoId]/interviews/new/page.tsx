@@ -20,15 +20,21 @@ export default function NewInterview() {
   const [interviewId, setInterviewId] = useState<string | null>(null);
   const [jobInfo, setJobInfo] = useState<JobInfo | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [chatMessages, setChatMessages] = useState<any[]>([]);
+  const [chatMessages] = useState<any[]>([]);
 
   const savedChatId = useRef<string | null>(null);
   const didConnect = useRef(false);
   const didSendSettings = useRef(false);
   const didSaveFinalDuration = useRef(false);
 
-  const { readyState, connect, disconnect, sendSessionSettings, messages, callDurationTimestamp } =
-    useVoice();
+  const {
+    readyState,
+    connect,
+    disconnect,
+    sendSessionSettings,
+    messages,
+    callDurationTimestamp,
+  } = useVoice();
 
   useEffect(() => {
     if (!jobInfoId) return;
@@ -69,25 +75,25 @@ export default function NewInterview() {
     [jobInfo]
   );
 
-  const connectNow = async () => {
-    setError(null);
-    try {
-      const { data } = await axios.get('/api/hume/token');
-      const accessToken = data?.accessToken;
-      const configId = data?.configId;
-      if (!accessToken) throw new Error('No access token');
-      if (!configId) throw new Error('No config ID set');
-      await connect({
-        auth: { type: 'accessToken', value: accessToken },
-        configId,
-      } as ConnectOptions);
-    } catch (err: any) {
-      setError(err.message || 'Failed to connect');
-      didConnect.current = false;
-    }
-  };
-
   useEffect(() => {
+    const connectNow = async () => {
+      setError(null);
+      try {
+        const { data } = await axios.get('/api/hume/token');
+        const accessToken = data?.accessToken;
+        const configId = data?.configId;
+        if (!accessToken) throw new Error('No access token');
+        if (!configId) throw new Error('No config ID set');
+        await connect({
+          auth: { type: 'accessToken', value: accessToken },
+          configId,
+        } as ConnectOptions);
+      } catch (err: any) {
+        setError(err.message || 'Failed to connect');
+        didConnect.current = false;
+      }
+    };
+
     if (didConnect.current) return;
     if (!interviewId) return;
     if (!jobInfo || !session) return;
@@ -96,7 +102,7 @@ export default function NewInterview() {
       connectNow();
     }, 100);
     return () => clearTimeout(timer);
-  }, [interviewId, jobInfo, session]);
+  }, [interviewId, jobInfo, session, connect]);
 
   useEffect(() => {
     if (readyState !== VoiceReadyState.OPEN) return;
@@ -168,10 +174,14 @@ export default function NewInterview() {
     return (
       <>
         <div className='flex justify-between items-center p-6'>
-          <div className='text-center'>{error && <p className='text-red-500 text-sm'>{error}</p>}</div>
+          <div className='text-center'>
+            {error && <p className='text-red-500 text-sm'>{error}</p>}
+          </div>
           <Button>Generate Feedback</Button>
         </div>
-        <Messages messages={chatMessages.length ? chatMessages : sampleMessages} />
+        <Messages
+          messages={chatMessages.length ? chatMessages : sampleMessages}
+        />
       </>
     );
   }

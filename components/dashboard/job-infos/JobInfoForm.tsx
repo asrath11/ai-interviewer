@@ -25,16 +25,19 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Session } from 'next-auth';
 import { useSession } from 'next-auth/react';
 
 const jobFormSchema = z.object({
   name: z.string().min(2, {
     message: 'Name must be at least 2 characters.',
   }),
-  title: z.string().min(2, {
-    message: 'Title must be at least 2 characters if provided.',
-  }).optional().or(z.literal('')),
+  title: z
+    .string()
+    .min(2, {
+      message: 'Title must be at least 2 characters if provided.',
+    })
+    .optional()
+    .or(z.literal('')),
   experience: z.enum(['Entry', 'Mid', 'Senior']),
   description: z.string().min(10, {
     message: 'Description must be at least 10 characters.',

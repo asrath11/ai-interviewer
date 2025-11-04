@@ -57,7 +57,7 @@ export function Pricing() {
             Simple, transparent pricing
           </h2>
           <p className='mt-6 text-lg leading-8 text-muted-foreground'>
-            Start with our free plan and upgrade when you're ready. No hidden
+            Start with our free plan and upgrade when you&apos;re ready. No hidden
             fees.
           </p>
         </div>
@@ -94,7 +94,9 @@ export function Pricing() {
                 </p>
                 <p className='mt-6 flex items-baseline gap-x-1'>
                   <span className='text-4xl font-bold tracking-tight text-foreground'>
-                    {typeof plan.price === 'number' ? `$${plan.price}` : plan.price}
+                    {typeof plan.price === 'number'
+                      ? `$${plan.price}`
+                      : plan.price}
                   </span>
                   {typeof plan.price === 'number' && (
                     <span className='text-sm font-semibold leading-6 text-muted-foreground'>

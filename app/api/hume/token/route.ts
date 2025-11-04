@@ -26,13 +26,34 @@ export async function GET() {
       accessToken,
       configId,
     });
-  } catch (error: any) {
-    console.error(
-      '❌ Failed to fetch Hume token/session:',
-      error.response?.data || error.message
-    );
+  } catch (error: unknown) {
+    console.error('❌ Failed to fetch Hume token/session:');
+    let errorMessage = 'Failed to fetch Hume token/session';
+    
+    if (error instanceof Error) {
+      console.error(error.message);
+      errorMessage = error.message;
+      
+      // Check if it's an Axios error
+      interface AxiosError extends Error {
+        response?: {
+          data?: unknown;
+        };
+      }
+      
+      const axiosError = error as AxiosError;
+      if (axiosError.response?.data) {
+        console.error('Error details:', axiosError.response.data);
+      }
+    } else if (typeof error === 'string') {
+      console.error(error);
+      errorMessage = error;
+    } else {
+      console.error('An unknown error occurred');
+    }
+    
     return NextResponse.json(
-      { error: error.message || 'Failed to fetch Hume token/session' },
+      { error: errorMessage },
       { status: 500 }
     );
   }

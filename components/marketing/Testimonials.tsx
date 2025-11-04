@@ -12,7 +12,7 @@ const testimonials = [
     name: 'Sarah Johnson',
     role: 'Software Engineer',
     company: 'TechCorp',
-    image: '/avatars/01.png',
+    image: 'https://i.pravatar.cc/150?img=1',
     content:
       'This platform completely transformed my interview preparation. The AI feedback was spot on and helped me land my dream job at a FAANG company!',
     rating: 5,
@@ -22,7 +22,7 @@ const testimonials = [
     name: 'Michael Chen',
     role: 'Product Manager',
     company: 'InnovateX',
-    image: '/avatars/02.png',
+    image: 'https://i.pravatar.cc/150?img=2',
     content:
       'As someone who used to get nervous during interviews, the practice sessions were a game-changer. I felt so much more confident in my actual interviews.',
     rating: 5,
@@ -32,7 +32,7 @@ const testimonials = [
     name: 'Emily Rodriguez',
     role: 'UX Designer',
     company: 'DesignHub',
-    image: '/avatars/03.png',
+    image: 'https://i.pravatar.cc/150?img=3',
     content:
       'The detailed feedback on my answers helped me understand exactly where I needed to improve. I went from multiple rejections to multiple offers!',
     rating: 4,
@@ -48,8 +48,8 @@ export function Testimonials() {
             What our users say
           </h2>
           <p className='mt-6 text-lg leading-8 text-muted-foreground'>
-            Don't just take our word for it. Here's what our users have to say
-            about their experience.
+            Don&apos;t just take our word for it. Here&apos;s what our users have
+            to say about their experience.
           </p>
         </div>
         <div className='mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-8 lg:mx-0 lg:max-w-none lg:grid-cols-3'>
@@ -75,7 +75,9 @@ export function Testimonials() {
                     </div>
                   </div>
                 </div>
-                <p className='mt-6 text-muted-foreground'>{testimonial.content}</p>
+                <p className='mt-6 text-muted-foreground'>
+                  {testimonial.content}
+                </p>
                 <div className='mt-4 flex items-center'>
                   {[...Array(5)].map((_, i) => (
                     <Star

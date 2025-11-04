@@ -4,17 +4,25 @@ import { useSession } from 'next-auth/react';
 import defaultAvatar from '../../public/user-round.png';
 import { Skeleton } from '@/components/ui/skeleton';
 
-type UserAvatarProps = ComponentProps<typeof Avatar>;
+type UserAvatarProps = ComponentProps<typeof Avatar> & {
+  user?: {
+    name?: string | null;
+    email?: string | null;
+    image?: string | null;
+  };
+};
 
-export function UserAvatar(props: UserAvatarProps) {
+export function UserAvatar({ user: propUser, ...props }: UserAvatarProps) {
   const { data: session, status } = useSession();
+  const user = propUser || session?.user;
 
-  if (status === 'loading') {
-    return <Skeleton className={`rounded-full h-10 w-10`} />;
+  if (status === 'loading' && !propUser) {
+    return <Skeleton className='rounded-full h-10 w-10' />;
   }
 
-  const name = session?.user?.name?.trim();
-  const email = session?.user?.email;
+  const name = user?.name?.trim();
+  const email = user?.email;
+  const image = user?.image;
 
   const initials =
     (name ?? email ?? '')
@@ -26,12 +34,10 @@ export function UserAvatar(props: UserAvatarProps) {
   return (
     <Avatar {...props} title={name ?? email ?? 'User'}>
       <AvatarImage
-        src={session?.user?.image ?? defaultAvatar.src}
+        src={image ?? defaultAvatar.src}
         alt={name ?? 'User'}
       />
-      <AvatarFallback className='uppercase bg-muted text-muted-foreground'>
-        {initials}
-      </AvatarFallback>
+      <AvatarFallback className='bg-primary/10'>{initials}</AvatarFallback>
     </Avatar>
   );
 }

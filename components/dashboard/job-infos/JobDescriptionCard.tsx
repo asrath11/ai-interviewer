@@ -138,7 +138,7 @@ export function JobDescriptionCard({
                 <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                 <AlertDialogDescription>
                   This action cannot be undone. This will permanently delete the
-                  job "{name}" and all its associated data.
+                  job &quot;{name}&quot; and all its associated data.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
