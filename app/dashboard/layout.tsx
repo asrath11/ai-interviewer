@@ -17,7 +17,7 @@ export default async function DashboardLayout({
       <Navbar
         user={{
           name: session.user?.name || 'User',
-          imageUrl: session.user?.image || '/default-avatar.png',
+          imageUrl: session.user?.imageUrl || '/default-avatar.png',
         }}
       />
       {children}
