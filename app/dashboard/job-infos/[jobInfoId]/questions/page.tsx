@@ -10,8 +10,9 @@ import { useParams, useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { generateQuestion } from '@/services/api/generate-question';
 import { Loader2Icon } from 'lucide-react';
-import { MarkdownRenderer } from '@/components/MarkdownRenderer';
+import { MarkdownRenderer } from '@/components/shared/MarkdownRenderer';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { useCompletion } from '@ai-sdk/react';
 
 function QuestionSection() {
   const { jobInfoId } = useParams<{ jobInfoId: string }>();
@@ -22,9 +23,23 @@ function QuestionSection() {
   const [generatedQuestion, setGeneratedQuestion] = useState(false);
   const [questionSeed, setQuestionSeed] = useState(Date.now());
   const [feedback, setFeedback] = useState('');
-  const [feedbackLoading, setFeedbackLoading] = useState(false);
   const router = useRouter();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const {
+    complete,
+    completion,
+    isLoading: feedbackLoading,
+  } = useCompletion({
+    api: '/api/job-info/questions/generate-feeback',
+    onError: (error) => {
+      console.error('Error generating feedback:', error);
+      setFeedback('Error generating feedback.');
+    },
+    onFinish: () => {
+      setFeedback(completion);
+    },
+  });
 
   const onGenerateClick = (difficulty: string) => {
     setGeneratedQuestion(true);
@@ -46,39 +61,16 @@ function QuestionSection() {
     if (generatedQuestion) refetch();
   }, [difficulty, questionSeed, generatedQuestion, refetch]);
 
-  // Streaming feedback handler
   const handleGetFeedback = async () => {
     if (!answer || !questionData) return;
-    setFeedbackLoading(true);
     setFeedback('');
-    try {
-      const res = await fetch(`/api/job-info/questions/generate-feeback`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          jobInfoId,
-          questionText: questionData, // questionData is the question text
-          answer,
-        }),
-      });
-      if (!res.body) throw new Error('No response body');
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
-      let done = false;
-      let streamed = '';
-      while (!done) {
-        const { value, done: doneReading } = await reader.read();
-        done = doneReading;
-        if (value) {
-          streamed += decoder.decode(value, { stream: !done });
-          setFeedback(streamed);
-        }
-      }
-    } catch {
-      setFeedback('Error generating feedback.');
-    } finally {
-      setFeedbackLoading(false);
-    }
+    await complete(
+      JSON.stringify({
+        jobInfoId,
+        questionText: questionData,
+        answer,
+      })
+    );
   };
 
   return (
@@ -104,7 +96,6 @@ function QuestionSection() {
                   setGeneratedQuestion(false);
                   setFeedback('');
                   setAnswer('');
-                  setFeedbackLoading(false);
                 }}
                 variant='ghost'
               >

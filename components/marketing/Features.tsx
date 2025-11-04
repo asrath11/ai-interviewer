@@ -1,7 +1,7 @@
 import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { FileSlidersIcon, BookOpenCheckIcon, SpeechIcon } from 'lucide-react';
 
-export default function Features() {
+export function Features() {
   const features = [
     {
       title: 'AI Interview Practice',

@@ -25,13 +25,16 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react'; // 👈 import NextAuth hook
+import { Session } from 'next-auth';
+import { useSession } from 'next-auth/react';
 
 const jobFormSchema = z.object({
   name: z.string().min(2, {
     message: 'Name must be at least 2 characters.',
   }),
-  title: z.string().min(2).optional(),
+  title: z.string().min(2, {
+    message: 'Title must be at least 2 characters if provided.',
+  }).optional().or(z.literal('')),
   experience: z.enum(['Entry', 'Mid', 'Senior']),
   description: z.string().min(10, {
     message: 'Description must be at least 10 characters.',
@@ -40,8 +43,9 @@ const jobFormSchema = z.object({
 
 type JobFormValues = z.infer<typeof jobFormSchema>;
 
-const defaultValues: Partial<JobFormValues> = {
+const defaultValues: JobFormValues = {
   name: '',
+  title: '',
   experience: 'Entry',
   description: '',
 };
@@ -58,12 +62,15 @@ export function JobInfoForm({
   submitLabel,
 }: JobInfoFormProps) {
   const router = useRouter();
-  const { data: session } = useSession(); // 👈 get logged-in user
+  const { data: session } = useSession();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<JobFormValues>({
     resolver: zodResolver(jobFormSchema),
-    defaultValues: { ...defaultValues, ...initialValues },
+    defaultValues: {
+      ...defaultValues,
+      ...initialValues,
+    },
   });
 
   async function handleCreate(data: JobFormValues) {
@@ -88,10 +95,30 @@ export function JobInfoForm({
       router.refresh();
     } catch (error) {
       console.error('Error creating job:', error);
+      throw error; // Re-throw to allow the form to handle the error
     } finally {
       setIsSubmitting(false);
     }
   }
+
+  const handleFormSubmit = async (formData: JobFormValues) => {
+    if (!session?.user?.id) {
+      console.error('User not authenticated');
+      return;
+    }
+
+    // Clean up the data by removing empty strings for optional fields
+    const cleanedData = {
+      ...formData,
+      title: formData.title?.trim() || undefined, // Convert empty string to undefined
+    };
+
+    if (onSubmit) {
+      await onSubmit({ ...cleanedData, userId: session.user.id });
+    } else {
+      await handleCreate(cleanedData);
+    }
+  };
 
   return (
     <Card className='w-full'>
@@ -101,19 +128,8 @@ export function JobInfoForm({
       <CardContent>
         <Form {...form}>
           <form
-            onSubmit={form.handleSubmit(async (data) => {
-              if (!session?.user?.id) {
-                alert('User not authenticated!');
-                return;
-              }
-
-              if (onSubmit) {
-                await onSubmit({ ...data, userId: session.user.id });
-              } else {
-                await handleCreate(data);
-              }
-            })}
-            className='space-y-8'
+            onSubmit={form.handleSubmit(handleFormSubmit)}
+            className='space-y-6'
           >
             <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
               <FormField
@@ -123,11 +139,8 @@ export function JobInfoForm({
                   <FormItem>
                     <FormLabel>Job Name</FormLabel>
                     <FormControl>
-                      <Input placeholder='Job Name' {...field} />
+                      <Input placeholder='Enter job name' {...field} />
                     </FormControl>
-                    <FormDescription>
-                      A descriptive name for this job opportunity.
-                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -140,11 +153,8 @@ export function JobInfoForm({
                   <FormItem>
                     <FormLabel>Job Title (Optional)</FormLabel>
                     <FormControl>
-                      <Input placeholder='Job Title' {...field} />
+                      <Input placeholder='e.g. Software Engineer' {...field} />
                     </FormControl>
-                    <FormDescription>
-                      The title of the job opportunity.
-                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -171,50 +181,38 @@ export function JobInfoForm({
                         <SelectItem value='Senior'>Senior Level</SelectItem>
                       </SelectContent>
                     </Select>
-                    <FormDescription>
-                      The experience level required for this job opportunity.
-                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-
-              <div className='md:col-span-2'>
-                <FormField
-                  control={form.control}
-                  name='description'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Job Description</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder='Enter job description here...'
-                          className='min-h-[120px]'
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        A description of the job opportunity and requirements.
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
             </div>
 
-            <Button
-              type='submit'
-              className='w-full font-bold text-md'
-              size='lg'
-              disabled={isSubmitting}
-            >
-              {isSubmitting
-                ? submitLabel
-                  ? `${submitLabel}...`
-                  : 'Saving...'
-                : submitLabel || 'Create Job Info'}
-            </Button>
+            <FormField
+              control={form.control}
+              name='description'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Job Description</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder='Paste the job description here...'
+                      className='min-h-[200px]'
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    You can paste the entire job posting here.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className='flex justify-end'>
+              <Button type='submit' disabled={isSubmitting}>
+                {isSubmitting ? 'Saving...' : submitLabel || 'Save Job'}
+              </Button>
+            </div>
           </form>
         </Form>
       </CardContent>

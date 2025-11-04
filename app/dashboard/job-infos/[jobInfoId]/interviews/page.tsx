@@ -4,8 +4,8 @@ import { authOptions } from '@/lib/authoption';
 import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import { Loader2 as Loader2Icon } from 'lucide-react';
-import InterviewsHeader from '@/app/dashboard/components/InterviewHeader';
-import InterviewsList from '@/app/dashboard/components/InterviewsList';
+import InterviewHeader from '@/components/dashboard/interviews/InterviewHeader';
+import InterviewsList from '@/components/dashboard/interviews/InterviewsList';
 
 export default async function InterviewPage({
   params,
@@ -31,7 +31,7 @@ export default async function InterviewPage({
           </div>
         }
       >
-        <InterviewsHeader />
+        <InterviewHeader />
       </Suspense>
 
       <InterviewsList interviews={interviews} />

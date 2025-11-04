@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { useSession, signIn } from 'next-auth/react';
 import Link from 'next/link';
 
-export default function NavButton() {
+export function NavButton() {
   const session = useSession();
   console.log(session);
 

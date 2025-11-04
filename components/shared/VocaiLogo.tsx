@@ -1,7 +1,8 @@
 import React from 'react';
 import Link from 'next/link';
-import Logo from '../public/logo.png';
+import Logo from '../../public/logo.png';
 import Image from 'next/image';
+
 type VocaiLogoProps = {
   className?: string;
   showText?: boolean;
@@ -18,12 +19,16 @@ export default function VocaiLogo({
       aria-label='Vocai Home'
     >
       <div className='relative h-12 w-12'>
-        <Image src={Logo} alt='Vocai Logo' />
+        <Image
+          src={Logo}
+          alt='VocAI Logo'
+          fill
+          className='object-contain'
+          priority
+        />
       </div>
       {showText && (
-        <span className='text-xl font-semibold tracking-tight text-gray-800 dark:text-white'>
-          Vocai
-        </span>
+        <span className='text-xl font-bold text-foreground'>VocAI</span>
       )}
     </Link>
   );

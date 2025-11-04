@@ -1,4 +1,4 @@
-export default function Stats() {
+export function Stats() {
   const stats = [
     { value: '95%', label: 'Success Rate' },
     { value: '10x', label: 'Faster Job Placement' },

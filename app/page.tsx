@@ -1,11 +1,11 @@
-import Navbar from './components/Navbar';
-import Hero from './components/Hero';
-import Features from './components/Features';
-import DetailedFeatures from './components/DetailedFeatures';
-import Stats from './components/Stats';
-import Testimonials from './components/Testimonials';
-import Pricing from './components/Pricing';
-import Footer from './components/Footer';
+import { Navbar } from '@/components/marketing/Navbar';
+import { Hero } from '@/components/marketing/Hero';
+import { Features } from '@/components/marketing/Features';
+import { DetailedFeatures } from '@/components/marketing/DetailedFeatures';
+import { Stats } from '@/components/marketing/Stats';
+import { Testimonials } from '@/components/marketing/Testimonials';
+import { Pricing } from '@/components/marketing/Pricing';
+import { Footer } from '@/components/marketing/Footer';
 
 export default function LandingPage() {
   return (

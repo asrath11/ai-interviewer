@@ -1,4 +1,4 @@
-export default function Footer() {
+export function Footer() {
   const currentYear = new Date().getFullYear();
 
   const footerLinks = [

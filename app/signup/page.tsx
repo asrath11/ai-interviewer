@@ -15,9 +15,9 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { PasswordInput } from '@/components/passwordInput';
+import { PasswordInput } from '@/components/shared/passwordInput';
 import { Button } from '@/components/ui/button';
-import SocialAuth from '@/components/socialAuth';
+import { SocialAuth } from '@/components/shared/socialAuth';
 import { Info } from 'lucide-react';
 
 // ✅ Validation schema

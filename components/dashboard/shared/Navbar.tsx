@@ -7,7 +7,7 @@ import {
   SpeechIcon,
   User,
 } from 'lucide-react';
-import { ToggleTheme } from '@/components/ToggleTheme';
+import { ToggleTheme } from '@/components/shared/ToggleTheme';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,11 +15,11 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import Link from 'next/link';
-import { UserAvatar } from '@/components/UserAvatar';
+import { UserAvatar } from '@/components/shared/UserAvatar';
 import { useParams, usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { signOut } from 'next-auth/react';
-import VocaiLogo from '@/components/VocaiLogo';
+import VocaiLogo from '@/components/shared/VocaiLogo';
 
 const navLinks = [
   { name: 'Interviews', href: 'interviews', Icon: SpeechIcon },

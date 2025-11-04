@@ -1,7 +1,7 @@
 import { ComponentProps } from 'react';
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { useSession } from 'next-auth/react';
-import defaultAvatar from '../public/user-round.png';
+import defaultAvatar from '../../public/user-round.png';
 import { Skeleton } from '@/components/ui/skeleton';
 
 type UserAvatarProps = ComponentProps<typeof Avatar>;

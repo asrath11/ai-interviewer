@@ -1,5 +1,5 @@
 import { google } from '@/services/ai/models/google';
-import { streamText, createTextStreamResponse } from 'ai';
+import { streamText } from 'ai';
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
@@ -42,112 +42,31 @@ export async function POST(request: Request) {
     const result = await streamText({
       model,
       prompt: `
-You are an **AI technical interviewer**. Your role is to generate a **coding challenge** that accurately tests a developer's practical and conceptual ability according to the given difficulty level and job description.
+You are an AI assistant that creates technical interview questions tailored to a specific job role. 
 
----
+Your task:
+Generate **one realistic and relevant** technical question that matches the skill requirements of the given job and aligns with the difficulty level provided.
 
-### 🧾 Job Description (trimmed)
-${description}
+Job Information:
+- Job Title: \`${jobInfo.title || 'N/A'}\`
+- Experience Level: \`${jobInfo.experience}\`
+- Difficulty Level: \`${difficulty}\`
+- Job Description: \`${description}\`
 
----
-
-### 🎚️ Difficulty
-${difficulty.toUpperCase()}
-
----
-
-### 🧠 Instructions
-Generate **exactly one coding challenge** that:
-- Matches the candidate’s target difficulty.
-- Is **relevant to the job’s tech stack** (e.g., frontend/backend or full-stack context).
-- Requires writing **actual code** (not multiple-choice or theoretical answers).
-- Includes **clear input/output requirements** and **at least one sample test case**.
-- Specifies the **expected time complexity**.
-- Explains **what concepts or reasoning a strong solution should show**.
-- Output should be in **clean Markdown**, **no JSON**.
-
----
-
-### 🎯 Difficulty Guidelines
-
-**Easy (JavaScript Foundations):**
-Focus on core JavaScript concepts such as:
-- Variables: \`var\`, \`let\`, \`const\`
-- Scope and closures
-- Arrays and strings (map, filter, reduce, loops)
-- Async basics (\`setTimeout\`, \`async/await\`, Promises)
-- Conditional logic and functions (including arrow functions)
-- Simple DOM or event-based tasks (if frontend-related)
-
-Example types of problems:
-- Reverse a string without using built-in methods
-- Count occurrences of words in a sentence
-- Implement a delay function using Promises
-- Toggle a button’s text on click (frontend)
-
----
-
-**Medium (Scenario-Based: Frontend + Backend):**
-Focus on **real-world application-level coding** — both frontend and backend.
-- **Frontend:** React/DOM logic, event handling, state management, API fetching, debouncing, etc.
-- **Backend:** Express.js route logic, asynchronous data flow, API rate limiting, error handling, data manipulation.
-
-Example types of problems:
-- Implement a custom debounce hook in React.
-- Build a simple Express.js endpoint that paginates data.
-- Create a function to merge and sort two API responses.
-- Implement a simple localStorage caching utility for fetched data.
-
-These questions should simulate real coding scenarios — not purely algorithmic puzzles.
-
----
-
-**Hard (Advanced/Systems & Algorithms):**
-Focus on complex design or optimization challenges:
-- Advanced algorithms (graphs, DP, concurrency)
-- Full-stack system design
-- Complex async coordination, caching, or rate limiting
-- Optimized backend logic or distributed workflows
-
----
-
-### 🧾 Output Format
-
-#### Coding Challenge
-**Title:**  
-**Difficulty:** ${difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}
-
-**Problem Description:**  
-(Explain the problem clearly and specify the goal.)
-
-**Function Signature (if applicable):**  
-\`\`\`js
-function solve(input) {
-  // Your code here
-}
-\`\`\`
-
-**Input Example:**  
-\`\`\`
-<example input>
-\`\`\`
-
-**Output Example:**  
-\`\`\`
-<example output>
-\`\`\`
-
-**Expected Time Complexity:**  
-O(...)
-
-**Strong Solution Should Include:**  
-(Explain what key concepts or patterns an ideal answer should demonstrate.)
-      `,
+Guidelines:
+- The question must reflect the skills and technologies mentioned in the job description.
+- Make sure the question matches the difficulty level (\`${difficulty}\`):
+  - Easy → basic understanding or syntax-level problems.
+  - Medium → practical, moderate complexity tasks or debugging.
+  - Hard → deep system design, optimization, or advanced problem-solving.
+- Prefer practical, real-world challenges over trivia.
+- Return only **one** question (no answers).
+- Format the output as **Markdown**, including any code snippets if relevant.
+- Stop generating output once the question is complete.
+  `,
     });
 
-    return createTextStreamResponse({
-      textStream: result.textStream,
-    });
+    return result.toTextStreamResponse();
   } catch (error) {
     console.error('Error generating coding problem:', error);
     return NextResponse.json(

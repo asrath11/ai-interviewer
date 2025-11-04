@@ -1,6 +1,6 @@
 import { Brain } from 'lucide-react';
 
-export default function DetailedFeatures() {
+export function DetailedFeatures() {
   return (
     <section className='py-20 bg-muted/20'>
       <div className='px-16'>

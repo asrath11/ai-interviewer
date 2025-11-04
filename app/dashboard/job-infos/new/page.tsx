@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import { JobInfoForm } from '../../components/JobInfoForm';
+import { JobInfoForm } from '@/components/dashboard/job-infos/JobInfoForm';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 

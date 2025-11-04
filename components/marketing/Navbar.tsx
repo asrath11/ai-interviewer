@@ -2,11 +2,11 @@
 import { Button } from '@/components/ui/button';
 import { Suspense } from 'react';
 import { signIn } from 'next-auth/react';
-import NavButton from './NavButton';
-import { ToggleTheme } from '@/components/ToggleTheme';
-import VocaiLogo from '@/components/VocaiLogo';
+import { NavButton } from './NavButton';
+import { ToggleTheme } from '@/components/shared/ToggleTheme';
+import VocaiLogo from '@/components/shared/VocaiLogo';
 
-export default function Navbar() {
+export function Navbar() {
   return (
     <nav className='border-b border-border bg-card/80 backdrop-blur-md sticky top-0 z-50 px-16'>
       <div>

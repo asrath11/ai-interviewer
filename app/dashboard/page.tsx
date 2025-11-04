@@ -1,12 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { Loader2, Plus } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import { JobDescriptionCard } from './components/JobDescriptionCard';
+import { JobDescriptionCard } from '@/components/dashboard/job-infos/JobDescriptionCard';
 
 type JobInfo = {
   id: string;
@@ -26,25 +26,25 @@ export default function DashboardPage() {
   useEffect(() => {
     if (status === 'unauthenticated') router.push('/');
   }, [status, router]);
-
-  useEffect(() => {
+  const fetchJobInfos = useCallback(async () => {
     if (!session?.user?.id) return;
 
-    const fetchJobInfos = async () => {
-      try {
-        const response = await fetch(`/api/job-info?userId=${session.user.id}`);
-        if (!response.ok) throw new Error('Failed to fetch jobs');
-        const data = await response.json();
-        setJobInfos(data);
-      } catch (error) {
-        console.error('Error fetching jobs:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchJobInfos();
+    setIsLoading(true);
+    try {
+      const response = await fetch(`/api/job-info?userId=${session.user.id}`);
+      if (!response.ok) throw new Error('Failed to fetch jobs');
+      const data = await response.json();
+      setJobInfos(data);
+    } catch (error) {
+      console.error('Error fetching jobs:', error);
+    } finally {
+      setIsLoading(false);
+    }
   }, [session?.user?.id]);
+
+  useEffect(() => {
+    fetchJobInfos();
+  }, [fetchJobInfos]);
 
   if (isLoading || status === 'loading') {
     return (
@@ -81,7 +81,7 @@ export default function DashboardPage() {
       ) : (
         <div className='grid gap-6 sm:grid-cols-2 lg:grid-cols-3'>
           {jobInfos.map((job) => (
-            <JobDescriptionCard key={job.id} {...job} />
+            <JobDescriptionCard key={job.id} {...job} onDelete={fetchJobInfos} />
           ))}
         </div>
       )}

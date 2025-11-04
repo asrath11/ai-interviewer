@@ -46,3 +46,31 @@ export async function PUT(request: Request, { params }: Params) {
     return NextResponse.json({ error: 'Job not found' }, { status: 404 });
   }
 }
+
+export async function DELETE(request: Request, { params }: Params) {
+  const { id } = await params;
+
+  try {
+    // First, check if the job info exists and belongs to the user
+    const jobInfo = await prisma.jobInfo.findUnique({
+      where: { id },
+    });
+
+    if (!jobInfo) {
+      return NextResponse.json({ error: 'Job not found' }, { status: 404 });
+    }
+
+    // Delete the job info
+    await prisma.jobInfo.delete({
+      where: { id },
+    });
+
+    return NextResponse.json({ success: true });
+  } catch (e) {
+    console.error('Error deleting job info:', e);
+    return NextResponse.json(
+      { error: 'Failed to delete job info' },
+      { status: 500 }
+    );
+  }
+}

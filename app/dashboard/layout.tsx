@@ -1,4 +1,4 @@
-import { Navbar } from './components/_Navbar';
+import { Navbar } from '@/components/dashboard/shared/Navbar';
 import { authOptions } from '@/lib/authoption';
 import { getServerSession } from 'next-auth';
 export default async function DashboardLayout({
@@ -7,12 +7,17 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }>) {
   const session = await getServerSession(authOptions);
+  if (!session) {
+    // Handle unauthenticated state - redirect to signin or show loading
+    return null;
+  }
+
   return (
     <>
       <Navbar
         user={{
-          name: session?.user?.name || '',
-          imageUrl: session?.user?.image || '',
+          name: session.user?.name || 'User',
+          imageUrl: session.user?.image || '/default-avatar.png',
         }}
       />
       {children}

@@ -41,3 +41,35 @@ export async function POST(req: NextRequest) {
   const jobInfo = await prisma.jobInfo.create({ data: parsed.data });
   return NextResponse.json(jobInfo, { status: 201 });
 }
+
+export async function DELETE(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const resolvedParams = await params;
+  const { id } = resolvedParams;
+
+  try {
+    // First, check if the job info exists and belongs to the user
+    const jobInfo = await prisma.jobInfo.findUnique({
+      where: { id },
+    });
+
+    if (!jobInfo) {
+      return NextResponse.json({ error: 'Job not found' }, { status: 404 });
+    }
+
+    // Delete the job info
+    await prisma.jobInfo.delete({
+      where: { id },
+    });
+
+    return NextResponse.json({ success: true });
+  } catch (e) {
+    console.error('Error deleting job info:', e);
+    return NextResponse.json(
+      { error: 'Failed to delete job info' },
+      { status: 500 }
+    );
+  }
+}
