@@ -7,7 +7,7 @@ import Link from 'next/link';
 
 export function Hero() {
   return (
-    <div className='relative overflow-hidden bg-gradient-to-b from-background/50 via-background to-background/50'>
+    <div className='relative overflow-hidden bg-linear-to-b from-background/50 via-background to-background/50'>
       <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
         <div className='mx-auto max-w-3xl pt-20 pb-16 text-center lg:pt-32'>
           <h1 className='text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl lg:text-6xl'>

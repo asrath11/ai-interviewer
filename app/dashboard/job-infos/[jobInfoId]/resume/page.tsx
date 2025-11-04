@@ -2,7 +2,7 @@
 import React, { useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Loader2Icon, UploadCloud } from 'lucide-react';
+import { UploadCloud } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import Analysis from './components/Analysis';
 import { experimental_useObject as useObject } from '@ai-sdk/react';
@@ -94,7 +94,7 @@ export default function ResumeUpload() {
     if (file) {
       generateAnalysis(null);
     }
-  }, [file]);
+  }, [file, generateAnalysis]);
 
   return (
     <div>

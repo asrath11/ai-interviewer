@@ -10,7 +10,7 @@ import InterviewsList from '@/components/dashboard/interviews/InterviewsList';
 export default async function InterviewPage({
   params,
 }: {
-  params: { jobInfoId: string };
+  params: Promise<{ jobInfoId: string }>;
 }) {
   const session = await getServerSession(authOptions);
   if (!session?.user) redirect('/signin');
