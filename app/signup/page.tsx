@@ -37,20 +37,16 @@ const signupSchema = z
 
 type SignupFormValues = z.infer<typeof signupSchema>;
 
-interface SignupProps {
-  heading?: string;
-  buttonText?: string;
-  googleText?: string;
-  signupText?: string;
-  signupUrl?: string;
-}
+// Default values for the signup form
+const DEFAULT_PROPS = {
+  heading: 'Signup',
+  buttonText: 'Create Account',
+  signupText: 'Already a user?',
+  signupUrl: '/signin',
+};
 
-const Signup = ({
-  heading = 'Signup',
-  buttonText = 'Create Account',
-  signupText = 'Already a user?',
-  signupUrl = '/signin',
-}: SignupProps) => {
+export default function Signup() {
+  const { heading, buttonText, signupText, signupUrl } = DEFAULT_PROPS;
   const [error, setError] = useState('');
   const form = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
@@ -172,6 +168,4 @@ const Signup = ({
       </div>
     </section>
   );
-};
-
-export default Signup;
+}
