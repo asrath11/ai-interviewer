@@ -36,26 +36,17 @@ const signinSchema = z.object({
 
 type SigninFormValues = z.infer<typeof signinSchema>;
 
-interface SigninProps {
-  heading?: string;
-  logo?: {
-    url: string;
-    src: string;
-    alt: string;
-    title?: string;
-  };
-  buttonText?: string;
-  googleText?: string;
-  signupText?: string;
-  signupUrl?: string;
-}
+// Default values for the signin form
+const DEFAULT_PROPS = {
+  heading: 'Login',
+  buttonText: 'Login',
+  signupText: 'Need an account?',
+  signupUrl: '/signup',
+};
 
-const Signin = ({
-  heading = 'Login',
-  buttonText = 'Login',
-  signupText = 'Need an account?',
-  signupUrl = '/signup',
-}: SigninProps) => {
+export default function Signin() {
+  const { heading, buttonText, signupText, signupUrl } = DEFAULT_PROPS;
+
   const [error, setError] = useState('');
   const form = useForm<SigninFormValues>({
     resolver: zodResolver(signinSchema),
@@ -171,6 +162,4 @@ const Signin = ({
       </div>
     </section>
   );
-};
-
-export default Signin;
+}

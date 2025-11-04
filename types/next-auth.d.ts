@@ -7,7 +7,7 @@ declare module 'next-auth' {
       id: string;
       email: string;
       name?: string | null;
-      image?: string | null;
+      imageUrl?: string | null;
       provider?: string;
       accessToken?: string;
       idToken?: string;
@@ -18,7 +18,7 @@ declare module 'next-auth' {
     id: string;
     email: string;
     name?: string | null;
-    image?: string | null;
+    imageUrl?: string | null;
   }
 }
 

@@ -8,7 +8,7 @@ type UserAvatarProps = ComponentProps<typeof Avatar> & {
   user?: {
     name?: string | null;
     email?: string | null;
-    image?: string | null;
+    imageUrl?: string | null;
   };
 };
 
@@ -22,7 +22,7 @@ export function UserAvatar({ user: propUser, ...props }: UserAvatarProps) {
 
   const name = user?.name?.trim();
   const email = user?.email;
-  const image = user?.image;
+  const image = user?.imageUrl;
 
   const initials =
     (name ?? email ?? '')
@@ -33,10 +33,7 @@ export function UserAvatar({ user: propUser, ...props }: UserAvatarProps) {
 
   return (
     <Avatar {...props} title={name ?? email ?? 'User'}>
-      <AvatarImage
-        src={image ?? defaultAvatar.src}
-        alt={name ?? 'User'}
-      />
+      <AvatarImage src={image ?? defaultAvatar.src} alt={name ?? 'User'} />
       <AvatarFallback className='bg-primary/10'>{initials}</AvatarFallback>
     </Avatar>
   );
