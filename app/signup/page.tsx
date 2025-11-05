@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -48,6 +49,7 @@ const DEFAULT_PROPS = {
 export default function Signup() {
   const { heading, buttonText, signupText, signupUrl } = DEFAULT_PROPS;
   const [error, setError] = useState('');
+  const router = useRouter();
   const form = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
@@ -62,6 +64,7 @@ export default function Signup() {
   const onSubmit = async (values: SignupFormValues) => {
     try {
       await axios.post('/api/auth/signup', values);
+      router.push('/signin');
     } catch (error) {
       if (axios.isAxiosError(error)) {
         setError(error.response?.data?.error || 'Something went wrong');
