@@ -94,7 +94,7 @@ export default function ResumeUpload() {
     if (file) {
       generateAnalysis(null);
     }
-  }, [file, generateAnalysis]);
+  }, [file]);
 
   return (
     <div>
