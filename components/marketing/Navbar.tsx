@@ -8,7 +8,7 @@ import VocaiLogo from '@/components/shared/VocaiLogo';
 
 export function Navbar() {
   return (
-    <nav className='border-b border-border bg-card/80 backdrop-blur-md sticky top-0 z-50 px-16'>
+    <nav className='border-b border-border bg-card/80 backdrop-blur-md sticky top-0 z-50 px-6 md:px-18'>
       <div>
         <div className='flex justify-between items-center h-16'>
           {/* Left: Logo */}

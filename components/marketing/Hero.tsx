@@ -4,8 +4,10 @@
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+import { useSession } from 'next-auth/react';
 
 export function Hero() {
+  const { data: session } = useSession();
   return (
     <div className='relative overflow-hidden bg-linear-to-b from-background/50 via-background to-background/50'>
       <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
@@ -20,7 +22,7 @@ export function Hero() {
           </p>
           <div className='mt-10 flex justify-center gap-4'>
             <Button asChild size='lg' className='text-lg'>
-              <Link href='/sign-up'>
+              <Link href={session?.user ? '/dashboard' : '/signin'}>
                 Get Started <ArrowRight className='ml-2 h-5 w-5' />
               </Link>
             </Button>

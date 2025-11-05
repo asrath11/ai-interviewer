@@ -57,7 +57,7 @@ export default function DashboardPage() {
   return (
     <div className='container mx-auto px-4 py-8 space-y-8'>
       {/* Header */}
-      <div className='flex justify-between items-center'>
+      <div className='flex sm:flex-row flex-col gap-3 justify-between md:items-center'>
         <h1 className='text-2xl md:text-3xl font-bold tracking-tight'>
           Job Descriptions
         </h1>
