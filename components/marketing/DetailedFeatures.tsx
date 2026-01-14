@@ -2,7 +2,7 @@ import { Brain } from 'lucide-react';
 
 export function DetailedFeatures() {
   return (
-    <section className='py-20 bg-muted/20'>
+    <section className='py-20 bg-primary/5'>
       <div className='px-16'>
         <div className='grid grid-cols-1 lg:grid-cols-2 gap-16 items-center'>
           <div>
@@ -36,10 +36,9 @@ export function DetailedFeatures() {
           <div className='bg-muted rounded-2xl p-8 h-full flex items-center justify-center'>
             <div className='relative w-full aspect-video bg-background rounded-lg border border-border flex items-center justify-center'>
               <div className='text-center p-8'>
-                <div className='w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6'>
+                <div className='w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse'>
                   <Brain className='w-8 h-8 text-primary' />
-                </div>
-                <h3 className='text-xl font-semibold mb-2'>
+                </div>                <h3 className='text-xl font-semibold mb-2'>
                   AI-Powered Interview Simulation
                 </h3>
                 <p className='text-muted-foreground'>

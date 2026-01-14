@@ -24,15 +24,14 @@ export function Features() {
   ];
 
   return (
-    <section className='py-20 px-16'>
+    <section className='py-8 px-16'>
       <div>
         <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
           {features.map((feature) => (
             <Card
               key={feature.title}
-              className='transition-all duration-300 transform hover:-translate-y-1'
-            >
-              <CardHeader className='pb-4'>
+              className='group transition-all duration-300 transform hover:-translate-y-1 group-hover:shadow-lg group-hover:shadow-primary'
+            >              <CardHeader className='pb-4'>
                 <div className='w-16 h-16 mb-4 bg-primary/10 flex items-center justify-center rounded-lg'>
                   <feature.Icon className='w-8 h-8 text-primary' />
                 </div>

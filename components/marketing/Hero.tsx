@@ -9,9 +9,12 @@ import { useSession } from 'next-auth/react';
 export function Hero() {
   const { data: session } = useSession();
   return (
-    <div className='relative overflow-hidden bg-linear-to-b from-background/50 via-background to-background/50'>
-      <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
-        <div className='mx-auto max-w-3xl pt-20 pb-16 text-center lg:pt-32'>
+    <section className='relative overflow-hidden py-20 md:py-32'>
+      <div
+        aria-hidden='true'
+        className='absolute inset-0 bg-gradient-to-b from-primary/5 via-background/30 to-background'
+      />      <div className='relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
+        <div className='mx-auto max-w-3xl text-center'>
           <h1 className='text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl lg:text-6xl'>
             Ace Your Next Interview with AI
           </h1>
@@ -32,6 +35,6 @@ export function Hero() {
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 }
