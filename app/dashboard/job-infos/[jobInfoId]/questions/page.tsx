@@ -7,12 +7,12 @@ import {
   ResizablePanelGroup,
 } from '@/components/ui/resizable';
 import { useParams, useRouter } from 'next/navigation';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { generateQuestion } from '@/services/api/generate-question';
+import { generateFeedback } from '@/services/api/generate-feedback';
 import { Loader2Icon } from 'lucide-react';
 import { MarkdownRenderer } from '@/components/shared/MarkdownRenderer';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { useCompletion } from '@ai-sdk/react';
 
 function QuestionSection() {
   const { jobInfoId } = useParams<{ jobInfoId: string }>();
@@ -22,30 +22,8 @@ function QuestionSection() {
   );
   const [generatedQuestion, setGeneratedQuestion] = useState(false);
   const [questionSeed, setQuestionSeed] = useState(Date.now());
-  const [feedback, setFeedback] = useState('');
   const router = useRouter();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-  const {
-    complete,
-    completion,
-    isLoading: feedbackLoading,
-  } = useCompletion({
-    api: '/api/job-info/questions/generate-feeback',
-    onError: (error) => {
-      console.error('Error generating feedback:', error);
-      setFeedback('Error generating feedback.');
-    },
-    onFinish: () => {
-      setFeedback(completion);
-    },
-  });
-
-  const onGenerateClick = (difficulty: string) => {
-    setGeneratedQuestion(true);
-    setDifficulty(difficulty as 'easy' | 'medium' | 'hard');
-    setQuestionSeed(Date.now()); // refresh seed for new fetch
-  };
 
   const {
     data: questionData,
@@ -57,20 +35,31 @@ function QuestionSection() {
     enabled: false,
   });
 
+  // Feedback Query
+  const {
+    data: feedback,
+    isFetching: feedbackLoading,
+    error: feedbackError,
+    refetch: getFeedback,
+  } = useQuery({
+    queryKey: ['feedback', jobInfoId, questionData, answer],
+    queryFn: () => generateFeedback(jobInfoId, questionData!, answer),
+    enabled: false,
+  });
+
+  const onGenerateClick = (difficulty: string) => {
+    setGeneratedQuestion(true);
+    setDifficulty(difficulty as 'easy' | 'medium' | 'hard');
+    setQuestionSeed(Date.now()); // refresh seed for new fetch
+  };
+
   useEffect(() => {
     if (generatedQuestion) refetch();
   }, [difficulty, questionSeed, generatedQuestion, refetch]);
 
-  const handleGetFeedback = async () => {
+  const handleGetFeedback = () => {
     if (!answer || !questionData) return;
-    setFeedback('');
-    await complete(
-      JSON.stringify({
-        jobInfoId,
-        questionText: questionData,
-        answer,
-      })
-    );
+    getFeedback();
   };
 
   return (
@@ -94,15 +83,24 @@ function QuestionSection() {
               <Button
                 onClick={() => {
                   setGeneratedQuestion(false);
-                  setFeedback('');
                   setAnswer('');
                 }}
                 variant='ghost'
               >
                 Skip
               </Button>
-              <Button disabled={!answer} onClick={handleGetFeedback}>
-                Answer
+              <Button
+                disabled={!answer || feedbackLoading}
+                onClick={handleGetFeedback}
+              >
+                {feedbackLoading ? (
+                  <>
+                    <Loader2Icon className='animate-spin mr-2 h-4 w-4' />
+                    Evaluating...
+                  </>
+                ) : (
+                  'Answer'
+                )}
               </Button>
             </>
           ) : (
@@ -149,14 +147,26 @@ function QuestionSection() {
 
             <ResizableHandle withHandle />
 
-            {/* Feedback Panel - only show if feedback is loading or available */}
-            {(feedbackLoading || feedback) && (
+            {/* Feedback Panel */}
+            {(feedbackLoading || feedback || feedbackError) && (
               <ResizablePanel defaultSize={40} minSize={20}>
                 <div className='h-full p-4'>
-                  <ScrollArea className='h-full'>
-                    <MarkdownRenderer>
-                      {feedbackLoading ? 'Getting feedback...' : feedback}
-                    </MarkdownRenderer>
+                  <h3 className='font-semibold mb-2'>AI Feedback</h3>
+                  <ScrollArea className='h-full w-full rounded-md border p-4 bg-muted/30'>
+                    {feedbackLoading ? (
+                      <div className='flex flex-col items-center justify-center h-40 text-muted-foreground'>
+                        <Loader2Icon className='animate-spin h-8 w-8 mb-2' />
+                        <p>Analyzing your answer...</p>
+                      </div>
+                    ) : feedbackError ? (
+                      <div className='flex items-center justify-center h-40 text-destructive'>
+                        <p>❌ Error generating feedback. Please try again.</p>
+                      </div>
+                    ) : (
+                      <div className='prose dark:prose-invert max-w-none text-sm'>
+                        <MarkdownRenderer>{feedback}</MarkdownRenderer>
+                      </div>
+                    )}
                   </ScrollArea>
                 </div>
               </ResizablePanel>

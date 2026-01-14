@@ -1,10 +1,10 @@
 import { google } from '@/services/ai/models/google';
-import { streamText } from 'ai';
+import { streamText, generateText } from 'ai';
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 
-const model = google('gemini-3-flash'); // ⚡ Fast, cost-efficient Gemini model
+const model = google('gemini-2.5-flash-lite'); // ⚡ Fast, cost-efficient Gemini model
 
 const RequestSchema = z.object({
   jobInfoId: z.string().min(1, 'Job info ID is required'),
@@ -15,7 +15,19 @@ const RequestSchema = z.object({
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { jobInfoId, questionText, answer } = RequestSchema.parse(body);
+
+    // Validate the request body
+    const validation = RequestSchema.safeParse(body);
+
+    if (!validation.success) {
+      console.error(
+        'Validation failed:',
+        JSON.stringify(validation.error.format(), null, 2)
+      );
+      return NextResponse.json({ error: 'Invalid input' }, { status: 400 });
+    }
+
+    const { jobInfoId, questionText, answer } = validation.data;
 
     const jobInfo = await prisma.jobInfo.findUnique({
       where: { id: jobInfoId },
@@ -26,7 +38,6 @@ export async function POST(request: Request) {
     }
 
     const description = jobInfo.description.slice(0, 700);
-
     const result = await streamText({
       model,
       prompt: `
@@ -83,9 +94,9 @@ ${answer}
 - Do not include any commentary outside this format.`,
     });
 
-    return new Response(result.textStream);
+    return result.toTextStreamResponse();
   } catch (error: unknown) {
-    console.error('Error generating feedback:');
+    console.error('Error generating feedback:', error);
     let errorMessage = 'Failed to generate feedback';
 
     if (error instanceof Error) {
