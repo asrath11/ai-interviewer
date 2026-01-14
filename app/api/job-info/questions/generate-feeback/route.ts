@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 
-const model = google('gemini-2.0-flash'); // ⚡ Fast, cost-efficient Gemini model
+const model = google('gemini-3-flash'); // ⚡ Fast, cost-efficient Gemini model
 
 const RequestSchema = z.object({
   jobInfoId: z.string().min(1, 'Job info ID is required'),
@@ -27,7 +27,7 @@ export async function POST(request: Request) {
 
     const description = jobInfo.description.slice(0, 700);
 
-const result = await streamText({
+    const result = await streamText({
       model,
       prompt: `
 You are an **AI Interview Evaluator**.  
@@ -87,7 +87,7 @@ ${answer}
   } catch (error: unknown) {
     console.error('Error generating feedback:');
     let errorMessage = 'Failed to generate feedback';
-    
+
     if (error instanceof Error) {
       console.error(error.message);
       errorMessage = error.message;
@@ -97,10 +97,7 @@ ${answer}
     } else {
       console.error('An unknown error occurred');
     }
-    
-    return NextResponse.json(
-      { error: errorMessage },
-      { status: 500 }
-    );
+
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }

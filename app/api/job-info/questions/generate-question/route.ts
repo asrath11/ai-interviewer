@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/authoption';
 
-const model = google('gemini-2.0-flash'); // ⚡ Fast, cost-efficient
+const model = google('gemini-2.5-flash-lite'); // ⚡ Fast, cost-efficient
 
 const RequestSchema = z.object({
   jobInfoId: z.string().min(1, 'Job info ID is required'),
