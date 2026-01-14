@@ -2,32 +2,11 @@
 import React, { useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { UploadCloud } from 'lucide-react';
+import { UploadCloud, Loader2 } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import Analysis from './components/Analysis';
 import { experimental_useObject as useObject } from '@ai-sdk/react';
-import { z } from 'zod';
-
-const FeedbackItemSchema = z.object({
-  name: z.string(),
-  message: z.string(),
-  type: z.enum(['strength', 'minor-improvement', 'major-improvement']),
-});
-
-const CategorySchema = z.object({
-  score: z.number(),
-  summary: z.string(),
-  feedback: z.array(FeedbackItemSchema),
-});
-
-const ResumeAnalysisSchema = z.object({
-  overallScore: z.number(),
-  ats: CategorySchema,
-  jobMatch: CategorySchema,
-  writingAndFormatting: CategorySchema,
-  keywordCoverage: CategorySchema,
-  other: CategorySchema,
-});
+import { ResumeAnalysisSchema } from '@/lib/schemas/resume-analysis';
 
 export default function ResumeUpload() {
   const { jobInfoId } = useParams<{ jobInfoId: string }>();
@@ -54,14 +33,11 @@ export default function ResumeUpload() {
       return fetch(url, { ...options, headers, body: formData });
     },
   });
+  console.log(aiAnalysis);
   const validateFile = (file: File) => {
-    const validTypes = [
-      'application/pdf',
-      'application/msword',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    ];
+    const validTypes = ['application/pdf'];
     if (!validTypes.includes(file.type)) {
-      setError('Please upload a PDF or Word document.');
+      setError('Please upload a PDF file.');
       return false;
     }
     if (file.size > MAX_SIZE_BYTES) {
@@ -114,22 +90,36 @@ export default function ResumeUpload() {
           <div
             className={`w-full border-2 border-dashed rounded-lg flex flex-col items-center justify-center p-8 cursor-pointer transition-colors ${
               error ? 'border-red-500' : 'border-muted hover:border-primary'
-            }`}
-            onClick={() => inputRef.current?.click()}
+            } ${isLoading ? 'cursor-not-allowed opacity-75' : ''}`}
+            onClick={() => !isLoading && inputRef.current?.click()}
             onDrop={handleDrop}
             onDragOver={(e) => e.preventDefault()}
           >
-            <UploadCloud className='w-10 h-10 text-muted-foreground mb-2' />
-            <h2 className='text-lg font-semibold'>
-              Drop your resume here or click to browse
-            </h2>
-            <span className='text-sm text-muted-foreground'>
-              Supports PDF or Word documents (Max {MAX_SIZE_MB}MB)
-            </span>
+            {isLoading ? (
+              <>
+                <Loader2 className='w-10 h-10 text-primary animate-spin mb-2' />
+                <h2 className='text-lg font-semibold'>
+                  Analyzing your resume...
+                </h2>
+                <span className='text-sm text-muted-foreground'>
+                  Please wait while we process your file
+                </span>
+              </>
+            ) : (
+              <>
+                <UploadCloud className='w-10 h-10 text-muted-foreground mb-2' />
+                <h2 className='text-lg font-semibold'>
+                  Drop your resume here or click to browse
+                </h2>
+                <span className='text-sm text-muted-foreground'>
+                  Supports PDF files (Max {MAX_SIZE_MB}MB)
+                </span>
+              </>
+            )}
             <input
               ref={inputRef}
               type='file'
-              accept='.pdf,.doc,.docx'
+              accept='.pdf'
               className='hidden'
               onChange={handleFileChange}
               disabled={isLoading}
@@ -137,11 +127,6 @@ export default function ResumeUpload() {
           </div>
           {error && (
             <div className='text-red-500 text-sm mt-2 font-medium'>{error}</div>
-          )}
-          {file && isLoading && (
-            <div className='text-sm text-muted-foreground mt-3 animate-pulse'>
-              Analyzing your resume...
-            </div>
           )}
         </Card>
         {aiAnalysis && <Analysis obj={aiAnalysis as any} />}

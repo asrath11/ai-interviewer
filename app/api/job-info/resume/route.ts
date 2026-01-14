@@ -1,9 +1,10 @@
 import { google } from '@/services/ai/models/google';
-import { streamText } from 'ai';
+import { generateObject } from 'ai';
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/authoption';
+import { ResumeAnalysisSchema } from '@/lib/schemas/resume-analysis';
 
 const model = google('gemini-2.5-flash');
 
@@ -92,8 +93,9 @@ Other Guidelines:
 - Stop generating output as soon you have provided the full feedback.
 `;
 
-    const result = await streamText({
+    const result = await generateObject({
       model,
+      schema: ResumeAnalysisSchema,
       messages: [
         {
           role: 'system',
@@ -116,7 +118,7 @@ Other Guidelines:
       ],
     });
 
-    return result.toTextStreamResponse();
+    return NextResponse.json(result.object);
   } catch (error) {
     console.error('Error analyzing resume:', error);
     return NextResponse.json(
