@@ -6,13 +6,17 @@
 ![Prisma](https://img.shields.io/badge/Prisma-6.18-2D3748?style=flat-square&logo=prisma)
 ![TailwindCSS](https://img.shields.io/badge/Tailwind-4.1-38B2AC?style=flat-square&logo=tailwind-css)
 
-> **Note:** This project uses Hume AI for voice-based interviews. The mock interview feature is currently disabled as it requires a paid Hume AI subscription. The platform is fully functional for job description management and interview preparation.
+> ⚠️ **Note**  
+> This project integrates **Hume AI** for real-time voice interviews.  
+> The voice interview feature requires a **paid Hume AI subscription**.  
+> All other features — job management, dashboards, and interview preparation — are fully functional.
 
-An intelligent interview preparation platform powered by AI that helps job seekers practice interviews, improve their responses, and build confidence before the real thing.
+An **AI-powered interview preparation platform** that helps job seekers practice technical interviews through **real-time voice interaction**, adaptive questioning, and structured feedback.
 
-🔗 **Repository:** [https://github.com/asrath11/ai-interviewer](https://github.com/asrath11/ai-interviewer)
+🔗 **Live Demo:** https://ai-interviewer-nine-lovat.vercel.app/  
+📦 **Repository:** https://github.com/asrath11/ai-interviewer  
 
-## ✨ Features
+## ✨ Key Features
 
 ### 🎤 AI-Powered Voice Interviews
 - **Real-time voice conversations** with AI interviewer using Hume AI
